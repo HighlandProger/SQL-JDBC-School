@@ -4,11 +4,11 @@ import ua.com.foxminded.domain.Student;
 
 public interface StudentDAO {
 
-    void createStudent(int id, int groupId, String name, String lastName);
+    Student createStudent(int id, int groupId, String name, String lastName) throws DAOException;
 
-    Student getStudentById(int id);
+    Student getStudentById(int id) throws DAOException;
 
-    void updateStudent(int id, int groupId, String name, String lastName);
+    Student updateStudent(int id, int groupId, String name, String lastName) throws DAOException;
 
     void deleteStudentById(int id);
 
