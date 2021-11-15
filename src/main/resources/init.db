@@ -1,0 +1,3 @@
+students=CREATE TABLE IF NOT EXISTS students(id SERIAL NOT NULL PRIMARY KEY, groupId SERIAL, name varchar(20), lastName varchar(20))
+groups=CREATE TABLE IF NOT EXISTS students(id SERIAL NOT NULL PRIMARY KEY, name varchar(20))
+courses=CREATE TABLE IF NOT EXISTS students(id SERIAL NOT NULL PRIMARY KEY, name varchar(20), description varchar(50))
