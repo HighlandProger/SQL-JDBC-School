@@ -4,11 +4,8 @@ import ua.com.foxminded.domain.Course;
 
 public interface CourseDAO {
 
-    void createCourse(int id, String name, String description);
+    Course create(long id, String name, String description);
 
-    Course getCourseById(int id);
+    Course getById(long id);
 
-    void updateCourse(int id, String name, String description);
-
-    void deleteGroupById(int id);
 }

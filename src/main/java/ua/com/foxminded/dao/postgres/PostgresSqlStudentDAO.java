@@ -8,23 +8,24 @@ import ua.com.foxminded.domain.Student;
 
 import java.sql.*;
 
-public class PostgresSqlStudentDao implements StudentDAO {
+public class PostgresSqlStudentDAO implements StudentDAO {
 
-    private static final Logger log = Logger.getLogger(PostgresSqlStudentDao.class.getName());
+    private static final Logger log = Logger.getLogger(PostgresSqlStudentDAO.class.getName());
     private static final String ID = "id";
     private static final String GROUP_ID = "groupId";
     private static final String NAME = "name";
     private static final String LAST_NAME = "lastName";
+    private final DAOFactory daoFactory = DAOFactory.getInstance();
 
     @Override
-    public Student createStudent(int id, int groupId, String name, String lastName) throws DAOException {
+    public Student create(long id, long groupId, String name, String lastName) throws DAOException {
 
         log.info("Creating new student with id = " + id);
         String sql = "INSERT INTO STUDENTS (id, groupId, name, lastName) VALUES (?,?,?,?);";
 
         Student student = null;
 
-        try (Connection connection = DAOFactory.getConnection();
+        try (Connection connection = daoFactory.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
              ResultSet resultSet = statement.getGeneratedKeys()) {
             setStatementParameters(statement, id, groupId, name, lastName);
@@ -39,17 +40,17 @@ public class PostgresSqlStudentDao implements StudentDAO {
     }
 
     @Override
-    public Student getStudentById(int id) throws DAOException {
+    public Student getById(long id) throws DAOException {
 
         log.trace("Looking for student with id = " + id);
         String sql = "SELECT * FROM STUDENTS WHERE id = ?;";
 
         Student student = null;
 
-        try (Connection connection = DAOFactory.getConnection();
+        try (Connection connection = daoFactory.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet resultSet = statement.getGeneratedKeys()) {
-            statement.setInt(1, id);
+            statement.setLong(1, id);
             statement.executeQuery();
             if (resultSet.next()) {
                 student = createStudentFromResultSet(resultSet);
@@ -70,34 +71,7 @@ public class PostgresSqlStudentDao implements StudentDAO {
     }
 
     @Override
-    public Student updateStudent(int id, int groupId, String name, String lastName) throws DAOException {
-
-        String sql = "UPDATE STUDENTS SET groupId = ?, name = ?, lastName = ?, WHERE id = ?;";
-
-        Student student = null;
-
-        try (Connection connection = DAOFactory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.getGeneratedKeys()) {
-            statement.setInt(1, groupId);
-            statement.setString(2, name);
-            statement.setString(3, lastName);
-            statement.setInt(4, id);
-            statement.execute();
-            resultSet.next();
-            student = createStudentFromResultSet(resultSet);
-
-        } catch (SQLException e) {
-            userCreateExceptionLog(e);
-        }
-        log.trace("Student with id = " + id + " was updated");
-        log.trace("Returning updated student");
-        return student;
-
-    }
-
-    @Override
-    public void deleteStudentById(int id) {
+    public void deleteById(int id) {
         log.trace("ToDo");
     }
 
@@ -107,9 +81,9 @@ public class PostgresSqlStudentDao implements StudentDAO {
     }
 
     private void setStatementParameters(PreparedStatement statement,
-                                        int id, int groupId, String name, String lastName) throws SQLException {
-        statement.setInt(1, id);
-        statement.setInt(2, groupId);
+                                        long id, long groupId, String name, String lastName) throws SQLException {
+        statement.setLong(1, id);
+        statement.setLong(2, groupId);
         statement.setString(3, name);
         statement.setString(4, lastName);
     }

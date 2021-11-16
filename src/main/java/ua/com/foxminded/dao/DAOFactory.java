@@ -9,41 +9,33 @@ import java.util.Properties;
 
 public class DAOFactory {
 
-    private static final String URL = getValueFromProperties("URL");
-    private static final String USER = getValueFromProperties("user");
-    private static final String PASSWORD = getValueFromProperties("password");
-    private static Connection connection;
+    private final String url = getValueFromProperties("URL");
+    private final String user = getValueFromProperties("user");
+    private final String password = getValueFromProperties("password");
+    private Connection connection;
 
     private DAOFactory() {
     }
 
-    public static Connection getConnection() throws DAOException {
+    public static DAOFactory getInstance(){
+        return new DAOFactory();
+    }
 
-        if (URL != null && USER != null && PASSWORD != null) {
+    public Connection getConnection() throws SQLException {
 
             try {
-                connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            } catch (SQLException e) {
-                throw new DAOException("No connection", e);
-            } finally {
-                if (connection != null) {
-                    closeConnection(connection);
+                if (url == null || user == null || password == null) {
+                    throw new DAOException("Property field is empty");
                 }
+                connection = DriverManager.getConnection(url, user, password);
+            } catch (DAOException e) {
+                e.printStackTrace();
             }
-        }
 
-        return connection;
+            return connection;
     }
 
-    private static void closeConnection(Connection connection) {
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static String getValueFromProperties(String key) {
+    private String getValueFromProperties(String key) {
 
         String value = null;
         Properties properties = new Properties();

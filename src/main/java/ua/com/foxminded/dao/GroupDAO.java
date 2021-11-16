@@ -4,11 +4,8 @@ import ua.com.foxminded.domain.Group;
 
 public interface GroupDAO {
 
-    void createGroup(int id, String name);
+    Group create(long id, String name);
 
-    Group getStudentById(int id);
+    Group getById(long id);
 
-    void updateGroup(int id, String name);
-
-    void deleteGroupById(int id);
 }

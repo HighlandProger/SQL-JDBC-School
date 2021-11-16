@@ -12,31 +12,25 @@ public class SqlRunner {
     private static final String STUDENTS_INIT_KEY = "students";
     private static final String GROUPS_INIT_KEY = "groups";
     private static final String COURSES_INIT_KEY = "courses";
+    private final DAOFactory daoFactory = DAOFactory.getInstance();
 
-    public static void main(String[] args) {
+    public void createTables() {
 
-        SqlRunner runner = new SqlRunner();
-        runner.createTables();
-    }
-
-    private void createTables() {
-
-        createTableByKey(STUDENTS_INIT_KEY);
-        createTableByKey(GROUPS_INIT_KEY);
-        createTableByKey(COURSES_INIT_KEY);
-    }
-
-    void createTableByKey(String key) {
-
-        try (Connection connection = DAOFactory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(getTableSQLString(key))) {
-            statement.executeUpdate();
-        } catch (DAOException | SQLException e) {
+        try (Connection connection = daoFactory.getConnection();
+             PreparedStatement groupsStatement = connection.prepareStatement(getTableSQL(GROUPS_INIT_KEY));
+             PreparedStatement coursesStatement = connection.prepareStatement(getTableSQL(COURSES_INIT_KEY));
+             PreparedStatement studentsStatement = connection.prepareStatement(getTableSQL(STUDENTS_INIT_KEY))
+             )
+        {
+            groupsStatement.executeUpdate();
+            coursesStatement.executeUpdate();
+            studentsStatement.executeUpdate();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private String getTableSQLString(String tableName) {
+    private String getTableSQL(String tableName) {
 
         String sql = null;
         Properties properties = new Properties();
