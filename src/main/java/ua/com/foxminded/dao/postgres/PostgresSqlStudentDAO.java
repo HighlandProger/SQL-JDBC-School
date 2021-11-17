@@ -1,6 +1,5 @@
 package ua.com.foxminded.dao.postgres;
 
-import org.apache.log4j.Logger;
 import ua.com.foxminded.dao.DAOException;
 import ua.com.foxminded.dao.DAOFactory;
 import ua.com.foxminded.dao.StudentDAO;
@@ -10,7 +9,6 @@ import java.sql.*;
 
 public class PostgresSqlStudentDAO implements StudentDAO {
 
-    private static final Logger log = Logger.getLogger(PostgresSqlStudentDAO.class.getName());
     private static final String ID = "id";
     private static final String GROUP_ID = "groupId";
     private static final String NAME = "name";
@@ -18,74 +16,58 @@ public class PostgresSqlStudentDAO implements StudentDAO {
     private final DAOFactory daoFactory = DAOFactory.getInstance();
 
     @Override
-    public Student create(long id, long groupId, String name, String lastName) throws DAOException {
+    public void create(String name, String lastName) {
 
-        log.info("Creating new student with id = " + id);
-        String sql = "INSERT INTO STUDENTS (id, groupId, name, lastName) VALUES (?,?,?,?);";
-
-        Student student = null;
+        String sql = "INSERT INTO STUDENTS (name, lastName) VALUES (?,?);";
 
         try (Connection connection = daoFactory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-             ResultSet resultSet = statement.getGeneratedKeys()) {
-            setStatementParameters(statement, id, groupId, name, lastName);
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            setStatementParameters(statement, name, lastName);
             statement.execute();
-            resultSet.next();
-            student = createStudentFromResultSet(resultSet);
         } catch (SQLException e) {
-            userCreateExceptionLog(e);
+            e.printStackTrace();
         }
-        log.trace("Returning student");
-        return student;
     }
 
     @Override
     public Student getById(long id) throws DAOException {
 
-        log.trace("Looking for student with id = " + id);
-        String sql = "SELECT * FROM STUDENTS WHERE id = ?;";
+        String sql = "SELECT * FROM students WHERE id = ?;";
 
+        ResultSet resultSet = null;
         Student student = null;
 
         try (Connection connection = daoFactory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.getGeneratedKeys()) {
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
-            statement.executeQuery();
+            resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 student = createStudentFromResultSet(resultSet);
             }
 
         } catch (SQLException e) {
-            userCreateExceptionLog(e);
+            e.printStackTrace();
+        } finally {
+            try {
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         if (student == null) {
-            log.debug("Student is not found");
-        } else {
-            log.trace("Student with id = " + id + " is found");
+            throw new DAOException("Student with id = " + id + " is not found");
         }
-        log.trace("Returning student");
+
         return student;
-
-    }
-
-    @Override
-    public void deleteById(int id) {
-        log.trace("ToDo");
-    }
-
-    private void userCreateExceptionLog(Exception e) throws DAOException {
-        log.error("Cannot create user", e);
-        throw new DAOException("Cannot create user", e);
     }
 
     private void setStatementParameters(PreparedStatement statement,
-                                        long id, long groupId, String name, String lastName) throws SQLException {
-        statement.setLong(1, id);
-        statement.setLong(2, groupId);
-        statement.setString(3, name);
-        statement.setString(4, lastName);
+                                        String name, String lastName) throws SQLException {
+        statement.setString(1, name);
+        statement.setString(2, lastName);
     }
 
     private Student createStudentFromResultSet(ResultSet resultSet) throws SQLException {

@@ -9,28 +9,36 @@ import java.util.Properties;
 
 public class SqlRunner {
 
-    private static final String STUDENTS_INIT_KEY = "students";
+    private static final String DELETE_GROUPS_INIT_KEY = "deleteGroups";
     private static final String GROUPS_INIT_KEY = "groups";
+    private static final String DELETE_COURSES_INIT_KEY = "deleteCourses";
     private static final String COURSES_INIT_KEY = "courses";
+    private static final String DELETE_STUDENTS_INIT_KEY = "deleteStudents";
+    private static final String STUDENTS_INIT_KEY = "students";
     private final DAOFactory daoFactory = DAOFactory.getInstance();
 
     public void createTables() {
 
         try (Connection connection = daoFactory.getConnection();
-             PreparedStatement groupsStatement = connection.prepareStatement(getTableSQL(GROUPS_INIT_KEY));
-             PreparedStatement coursesStatement = connection.prepareStatement(getTableSQL(COURSES_INIT_KEY));
-             PreparedStatement studentsStatement = connection.prepareStatement(getTableSQL(STUDENTS_INIT_KEY))
-             )
-        {
+             PreparedStatement deleteGroupsStatement = connection.prepareStatement(getSQL(DELETE_GROUPS_INIT_KEY));
+             PreparedStatement groupsStatement = connection.prepareStatement(getSQL(GROUPS_INIT_KEY));
+             PreparedStatement deleteCoursesStatement = connection.prepareStatement(getSQL(DELETE_COURSES_INIT_KEY));
+             PreparedStatement coursesStatement = connection.prepareStatement(getSQL(COURSES_INIT_KEY));
+             PreparedStatement deleteStudentsStatement = connection.prepareStatement(getSQL(DELETE_STUDENTS_INIT_KEY));
+             PreparedStatement studentsStatement = connection.prepareStatement(getSQL(STUDENTS_INIT_KEY))
+        ) {
+            deleteGroupsStatement.executeUpdate();
             groupsStatement.executeUpdate();
+            deleteCoursesStatement.executeUpdate();
             coursesStatement.executeUpdate();
+            deleteStudentsStatement.executeUpdate();
             studentsStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private String getTableSQL(String tableName) {
+    private String getSQL(String sqlKey) {
 
         String sql = null;
         Properties properties = new Properties();
@@ -40,7 +48,7 @@ public class SqlRunner {
             }
 
             properties.load(inputStream);
-            sql = properties.getProperty(tableName);
+            sql = properties.getProperty(sqlKey);
 
         } catch (IOException e) {
             e.printStackTrace();
