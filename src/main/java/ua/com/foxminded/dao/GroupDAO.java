@@ -4,7 +4,7 @@ import ua.com.foxminded.domain.Group;
 
 public interface GroupDAO {
 
-    void create(String name) throws DAOException;
+    void create(Group group) throws DAOException;
 
     Group getById(long id) throws DAOException;
 

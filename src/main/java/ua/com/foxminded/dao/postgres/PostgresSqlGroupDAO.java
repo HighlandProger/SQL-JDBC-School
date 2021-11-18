@@ -5,25 +5,28 @@ import ua.com.foxminded.dao.DAOFactory;
 import ua.com.foxminded.dao.GroupDAO;
 import ua.com.foxminded.domain.Group;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class PostgresSqlGroupDAO implements GroupDAO {
 
     private static final String ID = "id";
     private static final String NAME = "name";
-    private final DAOFactory daoFactory = DAOFactory.getInstance();
 
     @Override
-    public void create(String name) {
+    public void create(Group group) {
 
+        String name = group.getName();
         String sql = "INSERT INTO groups (name) VALUES (?);";
 
-        try (Connection connection = daoFactory.getConnection();
+        try (Connection connection = DAOFactory.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             setStatementParameters(statement, name);
             statement.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DAOException("Cannot create group", e);
         }
     }
 
@@ -35,7 +38,7 @@ public class PostgresSqlGroupDAO implements GroupDAO {
         ResultSet resultSet = null;
         Group group = null;
 
-        try (Connection connection = daoFactory.getConnection();
+        try (Connection connection = DAOFactory.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             resultSet = statement.executeQuery();
@@ -44,7 +47,7 @@ public class PostgresSqlGroupDAO implements GroupDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DAOException("Cannot get group by id", e);
         } finally {
             try {
                 if (resultSet != null) {

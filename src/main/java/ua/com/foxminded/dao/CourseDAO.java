@@ -4,7 +4,7 @@ import ua.com.foxminded.domain.Course;
 
 public interface CourseDAO {
 
-    void create(String name, String description);
+    void create(Course course);
 
     Course getById(long id) throws DAOException;
 

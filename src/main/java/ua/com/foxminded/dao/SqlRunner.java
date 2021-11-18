@@ -1,60 +1,39 @@
 package ua.com.foxminded.dao;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Properties;
 
 public class SqlRunner {
 
-    private static final String DELETE_GROUPS_INIT_KEY = "deleteGroups";
-    private static final String GROUPS_INIT_KEY = "groups";
-    private static final String DELETE_COURSES_INIT_KEY = "deleteCourses";
-    private static final String COURSES_INIT_KEY = "courses";
-    private static final String DELETE_STUDENTS_INIT_KEY = "deleteStudents";
-    private static final String STUDENTS_INIT_KEY = "students";
-    private final DAOFactory daoFactory = DAOFactory.getInstance();
+    private static final String TABLES_SQL_FILE_NAME = "init.db";
 
     public void createTables() {
 
-        try (Connection connection = daoFactory.getConnection();
-             PreparedStatement deleteGroupsStatement = connection.prepareStatement(getSQL(DELETE_GROUPS_INIT_KEY));
-             PreparedStatement groupsStatement = connection.prepareStatement(getSQL(GROUPS_INIT_KEY));
-             PreparedStatement deleteCoursesStatement = connection.prepareStatement(getSQL(DELETE_COURSES_INIT_KEY));
-             PreparedStatement coursesStatement = connection.prepareStatement(getSQL(COURSES_INIT_KEY));
-             PreparedStatement deleteStudentsStatement = connection.prepareStatement(getSQL(DELETE_STUDENTS_INIT_KEY));
-             PreparedStatement studentsStatement = connection.prepareStatement(getSQL(STUDENTS_INIT_KEY))
-        ) {
-            deleteGroupsStatement.executeUpdate();
-            groupsStatement.executeUpdate();
-            deleteCoursesStatement.executeUpdate();
-            coursesStatement.executeUpdate();
-            deleteStudentsStatement.executeUpdate();
-            studentsStatement.executeUpdate();
-        } catch (SQLException e) {
+        try (Connection connection = DAOFactory.getInstance().getConnection()) {
+            prepareStatements(connection);
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
     }
 
-    private String getSQL(String sqlKey) {
-
-        String sql = null;
-        Properties properties = new Properties();
-        try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("init.db")) {
-            if (inputStream == null) {
-                return null;
-            }
-
-            properties.load(inputStream);
-            sql = properties.getProperty(sqlKey);
-
-        } catch (IOException e) {
-            e.printStackTrace();
+    private void prepareStatements(Connection connection) throws IOException {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(TABLES_SQL_FILE_NAME);
+        if (inputStream == null) {
+            throw new IOException("Cannot get input stream from init.db");
         }
-
-        return sql;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        while (reader.ready()) {
+            try (PreparedStatement statement = connection.prepareStatement((reader.readLine()))) {
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                throw new DAOException("Cannot create tables", e);
+            }
+        }
     }
 
 }

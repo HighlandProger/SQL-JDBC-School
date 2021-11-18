@@ -3,6 +3,9 @@ package ua.com.foxminded.data;
 import ua.com.foxminded.dao.postgres.PostgresSqlCourseDAO;
 import ua.com.foxminded.dao.postgres.PostgresSqlGroupDAO;
 import ua.com.foxminded.dao.postgres.PostgresSqlStudentDAO;
+import ua.com.foxminded.domain.Course;
+import ua.com.foxminded.domain.Group;
+import ua.com.foxminded.domain.Student;
 import ua.com.foxminded.utils.StudentUtils;
 
 import java.util.List;
@@ -21,21 +24,21 @@ public class DataGenerator {
     }
 
     private void create10Groups() {
-        groupDAO.create("EC-10");
-        groupDAO.create("EC-20");
-        groupDAO.create("YR-30");
-        groupDAO.create("YR-40");
-        groupDAO.create("FI-50");
-        groupDAO.create("FI-60");
-        groupDAO.create("PE-70");
-        groupDAO.create("PE-80");
-        groupDAO.create("IN-90");
-        groupDAO.create("IN-99");
+        groupDAO.create(new Group("EC-10"));
+        groupDAO.create(new Group("EC-20"));
+        groupDAO.create(new Group("YR-30"));
+        groupDAO.create(new Group("YR-40"));
+        groupDAO.create(new Group("FI-50"));
+        groupDAO.create(new Group("FI-60"));
+        groupDAO.create(new Group("PE-70"));
+        groupDAO.create(new Group("PE-80"));
+        groupDAO.create(new Group("IN-90"));
+        groupDAO.create(new Group("IN-99"));
     }
 
     private void create200Students() {
         for (int i = 0; i < 200; i++) {
-            studentDAO.create(getRandomStudentName(), getRandomStudentLastName());
+            studentDAO.create(new Student(getRandomStudentName(), getRandomStudentLastName()));
         }
     }
 
@@ -53,16 +56,15 @@ public class DataGenerator {
 
     private void create10Courses() {
 
-        courseDAO.create("math", "It's about calculating");
-        courseDAO.create("biology", "Anatomy, mamals, dinosaurs...");
-        courseDAO.create("chemists", "Don't try it at home");
-        courseDAO.create("history", "It was rewritten too many times");
-        courseDAO.create("physics", "Very cool course. Be careful with electricity");
-        courseDAO.create("geography", "London is a capital of Great Britain");
-        courseDAO.create("literature", "The war and the piece is very long");
-        courseDAO.create("informatics", "I hope they moved from Pascal and QBasic");
-        courseDAO.create("painting", "There are too many types of pencils");
-        courseDAO.create("drawing", "Great architecture experience");
-
+        courseDAO.create(new Course("math", "It's about calculating"));
+        courseDAO.create(new Course("biology", "Anatomy, mamals, dinosaurs..."));
+        courseDAO.create(new Course("chemists", "Don't try it at home"));
+        courseDAO.create(new Course("history", "It was rewritten too many times"));
+        courseDAO.create(new Course("physics", "Very cool course. Be careful with electricity"));
+        courseDAO.create(new Course("geography", "London is a capital of Great Britain"));
+        courseDAO.create(new Course("literature", "The war and the piece is very long"));
+        courseDAO.create(new Course("informatics", "I hope they moved from Pascal and QBasic"));
+        courseDAO.create(new Course("painting", "There are too many types of pencils"));
+        courseDAO.create(new Course("drawing", "Great architecture experience"));
     }
 }

@@ -1,6 +1,6 @@
-deleteGroups=DROP TABLE IF EXISTS groups CASCADE;
-groups=CREATE TABLE IF NOT EXISTS groups(id SERIAL NOT NULL PRIMARY KEY, name varchar(20));
-deleteCourses=DROP TABLE IF EXISTS courses;
-courses=CREATE TABLE IF NOT EXISTS courses(id SERIAL NOT NULL PRIMARY KEY, name varchar(20), description varchar(50));
-deleteStudents=DROP TABLE IF EXISTS students;
-students=CREATE TABLE IF NOT EXISTS students(id SERIAL NOT NULL PRIMARY KEY, group_id INT, name varchar(20), lastName varchar(20), FOREIGN KEY(group_id) REFERENCES groups(id));
+DROP TABLE IF EXISTS groups CASCADE;
+DROP TABLE IF EXISTS students;
+DROP TABLE IF EXISTS courses;
+CREATE TABLE IF NOT EXISTS groups(id SERIAL NOT NULL PRIMARY KEY, name varchar(20));
+CREATE TABLE IF NOT EXISTS courses(id SERIAL NOT NULL PRIMARY KEY, name varchar(20), description varchar(50));
+CREATE TABLE IF NOT EXISTS students(id SERIAL NOT NULL PRIMARY KEY, group_id INT, name varchar(20), lastName varchar(20), FOREIGN KEY(group_id) REFERENCES groups(id));

@@ -15,19 +15,20 @@ public class PostgresSqlCourseDAO implements CourseDAO {
     private static final String ID = "id";
     private static final String NAME = "name";
     private static final String DESCRIPTION = "description";
-    private final DAOFactory daoFactory = DAOFactory.getInstance();
 
     @Override
-    public void create(String name, String description) {
+    public void create(Course course) {
 
+        String name = course.getName();
+        String description = course.getDescription();
         String sql = "INSERT INTO courses (name, description) VALUES (?, ?);";
 
-        try (Connection connection = daoFactory.getConnection();
+        try (Connection connection = DAOFactory.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             setStatementParameters(statement, name, description);
             statement.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DAOException("Cannot create course", e);
         }
     }
 
@@ -39,7 +40,7 @@ public class PostgresSqlCourseDAO implements CourseDAO {
         ResultSet resultSet = null;
         Course course = null;
 
-        try (Connection connection = daoFactory.getConnection();
+        try (Connection connection = DAOFactory.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             resultSet = statement.executeQuery();
@@ -48,7 +49,7 @@ public class PostgresSqlCourseDAO implements CourseDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DAOException("Cannot get course by id", e);
         } finally {
             try {
                 if (resultSet != null) {
