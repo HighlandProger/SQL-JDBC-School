@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PostgresSqlCourseDAO implements CourseDAO {
 
@@ -19,13 +21,11 @@ public class PostgresSqlCourseDAO implements CourseDAO {
     @Override
     public void create(Course course) {
 
-        String name = course.getName();
-        String description = course.getDescription();
         String sql = "INSERT INTO courses (name, description) VALUES (?, ?);";
 
         try (Connection connection = DAOFactory.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            setStatementParameters(statement, name, description);
+            setStatementParameters(statement, course.getName(), course.getDescription());
             statement.execute();
         } catch (SQLException e) {
             throw new DAOException("Cannot create course", e);
@@ -33,31 +33,42 @@ public class PostgresSqlCourseDAO implements CourseDAO {
     }
 
     @Override
-    public Course getById(long id) throws DAOException {
+    public List<Course> getAll() {
+
+        List<Course> courses = new ArrayList<>();
+        String sql = "SELECT * FROM courses;";
+
+        try (Connection connection = DAOFactory.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                courses.add(createCourseFromResultSet(resultSet));
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException("Cannot get groups", e);
+        }
+
+        return courses;
+    }
+
+    @Override
+    public Course getById(long id) {
 
         String sql = "SELECT * FROM courses WHERE id = ?;";
 
-        ResultSet resultSet = null;
         Course course = null;
 
         try (Connection connection = DAOFactory.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
-            resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 course = createCourseFromResultSet(resultSet);
             }
-
         } catch (SQLException e) {
             throw new DAOException("Cannot get course by id", e);
-        } finally {
-            try {
-                if (resultSet != null) {
-                    resultSet.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
 
         if (course == null) {

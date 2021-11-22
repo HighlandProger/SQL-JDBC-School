@@ -5,14 +5,17 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public class DAOFactory {
 
+    private static final Map<String, String> PROPERTIES_MAP = getPropertiesMap();
+    private static final String URL = "URL";
+    private static final String USER = "user";
+    private static final String PASSWORD = "password";
     private static DAOFactory instance;
-    private final String url = getValueFromProperties("URL");
-    private final String user = getValueFromProperties("user");
-    private final String password = getValueFromProperties("password");
 
     private DAOFactory() {
     }
@@ -24,9 +27,32 @@ public class DAOFactory {
         return instance;
     }
 
+    private static Map<String, String> getPropertiesMap() {
+
+        Map<String, String> propertiesMap = new HashMap<>();
+        Properties properties = new Properties();
+        try (InputStream inputStream = DAOFactory.class.getClassLoader().getResourceAsStream("db.properties")) {
+            if (inputStream == null) {
+                throw new IOException("Cannot read properties");
+            }
+            properties.load(inputStream);
+            for (String key : properties.stringPropertyNames()) {
+                propertiesMap.put(key, properties.getProperty(key));
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return propertiesMap;
+    }
+
     public Connection getConnection() throws SQLException {
 
         Connection connection = null;
+        String url = PROPERTIES_MAP.get(URL);
+        String user = PROPERTIES_MAP.get(USER);
+        String password = PROPERTIES_MAP.get(PASSWORD);
 
         if (url != null && user != null && password != null) {
             try {
@@ -39,24 +65,4 @@ public class DAOFactory {
         }
         return connection;
     }
-
-    private String getValueFromProperties(String key) {
-
-        String value = null;
-        Properties properties = new Properties();
-        try (InputStream inputStream = DAOFactory.class.getClassLoader().getResourceAsStream("db.properties")) {
-            if (inputStream == null) {
-                return null;
-            }
-
-            properties.load(inputStream);
-            value = properties.getProperty(key);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return value;
-    }
-
 }

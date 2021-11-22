@@ -16,24 +16,39 @@ public class SqlRunner {
 
         try (Connection connection = DAOFactory.getInstance().getConnection()) {
             prepareStatements(connection);
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private void prepareStatements(Connection connection) throws IOException {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(TABLES_SQL_FILE_NAME);
-        if (inputStream == null) {
-            throw new IOException("Cannot get input stream from init.db");
-        }
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        while (reader.ready()) {
-            try (PreparedStatement statement = connection.prepareStatement((reader.readLine()))) {
-                statement.executeUpdate();
-            } catch (SQLException e) {
-                throw new DAOException("Cannot create tables", e);
+    private String getTablesSql() {
+
+        StringBuilder sql = new StringBuilder();
+
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(TABLES_SQL_FILE_NAME)) {
+            if (inputStream == null) {
+                throw new IOException("Cannot get resource file stream");
             }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            while (reader.ready()) {
+                sql.append(reader.readLine());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return sql.toString();
+    }
+
+    private void prepareStatements(Connection connection) {
+
+        String tablesSql = getTablesSql();
+
+        try (PreparedStatement statement = connection.prepareStatement((tablesSql))) {
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DAOException("Cannot create tables", e);
+        }
+
     }
 
 }

@@ -1,5 +1,6 @@
 package ua.com.foxminded.dao.postgres;
 
+import org.postgresql.util.PSQLException;
 import ua.com.foxminded.dao.DAOException;
 import ua.com.foxminded.dao.DAOFactory;
 import ua.com.foxminded.dao.StudentDAO;
@@ -7,6 +8,8 @@ import ua.com.foxminded.domain.Group;
 import ua.com.foxminded.domain.Student;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PostgresSqlStudentDAO implements StudentDAO {
 
@@ -18,29 +21,26 @@ public class PostgresSqlStudentDAO implements StudentDAO {
     @Override
     public void create(Student student) {
 
-        String name = student.getName();
-        String lastName = student.getLastName();
         String sql = "INSERT INTO STUDENTS (name, lastName) VALUES (?,?);";
 
         try (Connection connection = DAOFactory.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            setStatementParameters(statement, name, lastName);
+            setStatementParameters(statement, student.getName(), student.getLastName());
             statement.execute();
         } catch (SQLException e) {
             throw new DAOException("Cannot create student", e);
         }
     }
 
+    @Override
     public void assignStudentToGroup(Student student, Group group) {
 
-        long groupId = group.getId();
-        long studentsId = student.getId();
         String sql = "UPDATE students SET group_id = ? WHERE id = ?;";
 
         try (Connection connection = DAOFactory.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, groupId);
-            statement.setLong(2, studentsId);
+            statement.setLong(1, group.getId());
+            statement.setLong(2, student.getId());
             statement.execute();
         } catch (SQLException e) {
             throw new DAOException("Cannot update student", e);
@@ -48,30 +48,42 @@ public class PostgresSqlStudentDAO implements StudentDAO {
     }
 
     @Override
-    public Student getById(long id) throws DAOException {
+    public List<Student> getAll() {
+
+        List<Student> students = new ArrayList<>();
+        String sql = "SELECT * FROM students;";
+
+        try (Connection connection = DAOFactory.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                students.add(createStudentFromResultSet(resultSet));
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException("Cannot get students", e);
+        }
+
+        return students;
+    }
+
+    @Override
+    public Student getById(long id) {
 
         String sql = "SELECT * FROM students WHERE id = ?;";
 
-        ResultSet resultSet = null;
         Student student = null;
 
         try (Connection connection = DAOFactory.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
-            resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 student = createStudentFromResultSet(resultSet);
             }
         } catch (SQLException e) {
             throw new DAOException("Cannot get student by id", e);
-        } finally {
-            try {
-                if (resultSet != null) {
-                    resultSet.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
 
         if (student == null) {
@@ -81,18 +93,41 @@ public class PostgresSqlStudentDAO implements StudentDAO {
         return student;
     }
 
+    @Override
+    public void delete(long id) {
+
+        String sql = "DELETE FROM students WHERE id = ?;";
+
+        try (Connection connection = DAOFactory.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, id);
+            statement.execute();
+        } catch (SQLException e) {
+            throw new DAOException("Cannot delete student", e);
+        }
+    }
+
+    protected Student createStudentFromResultSet(ResultSet resultSet) throws SQLException {
+
+        try {
+            return new Student(
+                resultSet.getInt(ID),
+                resultSet.getInt(GROUP_ID),
+                resultSet.getString(NAME),
+                resultSet.getString(LAST_NAME));
+        } catch (PSQLException e) {
+            return new Student(
+                resultSet.getInt(ID),
+                0,
+                resultSet.getString(NAME),
+                resultSet.getString(LAST_NAME));
+        }
+
+    }
+
     private void setStatementParameters(PreparedStatement statement,
                                         String name, String lastName) throws SQLException {
         statement.setString(1, name);
         statement.setString(2, lastName);
     }
-
-    private Student createStudentFromResultSet(ResultSet resultSet) throws SQLException {
-        return new Student(
-            resultSet.getInt(ID),
-            resultSet.getInt(GROUP_ID),
-            resultSet.getString(NAME),
-            resultSet.getString(LAST_NAME));
-    }
-
 }

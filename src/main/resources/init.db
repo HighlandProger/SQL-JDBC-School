@@ -1,6 +1,8 @@
 DROP TABLE IF EXISTS groups CASCADE;
-DROP TABLE IF EXISTS students;
-DROP TABLE IF EXISTS courses;
+DROP TABLE IF EXISTS students CASCADE;
+DROP TABLE IF EXISTS courses CASCADE;
+DROP TABLE IF EXISTS course_student CASCADE;
 CREATE TABLE IF NOT EXISTS groups(id SERIAL NOT NULL PRIMARY KEY, name varchar(20));
-CREATE TABLE IF NOT EXISTS courses(id SERIAL NOT NULL PRIMARY KEY, name varchar(20), description varchar(50));
 CREATE TABLE IF NOT EXISTS students(id SERIAL NOT NULL PRIMARY KEY, group_id INT, name varchar(20), lastName varchar(20), FOREIGN KEY(group_id) REFERENCES groups(id));
+CREATE TABLE IF NOT EXISTS courses(id SERIAL NOT NULL PRIMARY KEY, name varchar(20), description varchar(50));
+CREATE TABLE IF NOT EXISTS course_student (course_id INT REFERENCES courses(id) ON DELETE CASCADE, student_id INT REFERENCES students(id) ON DELETE CASCADE, PRIMARY KEY (course_id, student_id));

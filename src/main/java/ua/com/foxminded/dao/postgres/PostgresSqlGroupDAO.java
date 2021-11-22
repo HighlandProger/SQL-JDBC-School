@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PostgresSqlGroupDAO implements GroupDAO {
 
@@ -18,12 +20,11 @@ public class PostgresSqlGroupDAO implements GroupDAO {
     @Override
     public void create(Group group) {
 
-        String name = group.getName();
         String sql = "INSERT INTO groups (name) VALUES (?);";
 
         try (Connection connection = DAOFactory.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            setStatementParameters(statement, name);
+            setStatementParameters(statement, group.getName());
             statement.execute();
         } catch (SQLException e) {
             throw new DAOException("Cannot create group", e);
@@ -31,38 +32,45 @@ public class PostgresSqlGroupDAO implements GroupDAO {
     }
 
     @Override
-    public Group getById(long id) throws DAOException {
+    public List<Group> getAll() {
 
-        String sql = "SELECT * FROM groups WHERE id = ?;";
-
-        ResultSet resultSet = null;
-        Group group = null;
+        List<Group> groups = new ArrayList<>();
+        String sql = "SELECT * FROM groups;";
 
         try (Connection connection = DAOFactory.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, id);
-            resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                group = createGroupFromResultSet(resultSet);
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                groups.add(createGroupFromResultSet(resultSet));
             }
 
         } catch (SQLException e) {
-            throw new DAOException("Cannot get group by id", e);
-        } finally {
-            try {
-                if (resultSet != null) {
-                    resultSet.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
+            throw new DAOException("Cannot get groups", e);
+        }
+
+        return groups;
+    }
+
+    public List<Group> getLessOrEqualsByStudentsCount(int studentsCount) {
+
+        List<Group> groups = new ArrayList<>();
+        String sql = "SELECT g.* FROM students s, groups g WHERE s.group_id=g.id GROUP BY g.id HAVING count(s.*)<=?;";
+
+        try (Connection connection = DAOFactory.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, studentsCount);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                groups.add(createGroupFromResultSet(resultSet));
             }
+
+        } catch (SQLException e) {
+            throw new DAOException("Cannot get group by students count", e);
         }
 
-        if (group == null) {
-            throw new DAOException("Group is not found");
-        }
-
-        return group;
+        return groups;
     }
 
     private void setStatementParameters(PreparedStatement statement, String name) throws SQLException {
