@@ -1,8 +1,7 @@
-package ua.com.foxminded.dao;
+package ua.com.foxminded.menu;
 
 import ua.com.foxminded.dao.postgres.PostgresSqlCourseDAO;
 import ua.com.foxminded.dao.postgres.PostgresSqlGroupDAO;
-import ua.com.foxminded.dao.postgres.PostgresSqlStudentCourseDAO;
 import ua.com.foxminded.dao.postgres.PostgresSqlStudentDAO;
 import ua.com.foxminded.domain.Course;
 import ua.com.foxminded.domain.Group;
@@ -10,12 +9,11 @@ import ua.com.foxminded.domain.Student;
 
 import java.util.List;
 
-public class SQLQueries {
+public class SQLMenuQueries {
 
     private static final String SPACE = " ";
     private final PostgresSqlGroupDAO groupDAO = new PostgresSqlGroupDAO();
     private final PostgresSqlStudentDAO studentDAO = new PostgresSqlStudentDAO();
-    private final PostgresSqlStudentCourseDAO studentCourseDAO = new PostgresSqlStudentCourseDAO();
     private final PostgresSqlCourseDAO courseDAO = new PostgresSqlCourseDAO();
 
     public String findAllGroupsWithLessOrEqualsStudentCount(int studentCount) {
@@ -30,7 +28,7 @@ public class SQLQueries {
     }
 
     public String findAllStudentsRelatedToCourseWithGivenName(String courseName) {
-        List<Student> students = studentCourseDAO.getStudentsByCourseName(courseName);
+        List<Student> students = studentDAO.getByCourseName(courseName);
 
         StringBuilder builder = new StringBuilder();
         for (Student student : students) {
@@ -54,11 +52,15 @@ public class SQLQueries {
     public void addStudentToTheCourseFromAList(long studentId, long courseId) {
         Student student = studentDAO.getById(studentId);
         Course course = courseDAO.getById(courseId);
-        studentCourseDAO.assignCourseToStudent(course, student);
+        studentDAO.assignToCourse(course, student);
     }
 
     public void removeStudentFromCourse(long studentId, long courseId) {
 
-        studentCourseDAO.delete(studentId, courseId);
+        studentDAO.deleteCourseRelation(studentId, courseId);
+    }
+
+    public List<Course> getCoursesList(){
+        return courseDAO.getAll();
     }
 }

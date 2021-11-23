@@ -1,6 +1,6 @@
 package ua.com.foxminded.dao.postgres;
 
-import ua.com.foxminded.dao.DAOException;
+import ua.com.foxminded.exception.DAOException;
 import ua.com.foxminded.dao.DAOFactory;
 import ua.com.foxminded.dao.GroupDAO;
 import ua.com.foxminded.domain.Group;
@@ -52,6 +52,7 @@ public class PostgresSqlGroupDAO implements GroupDAO {
         return groups;
     }
 
+    @Override
     public List<Group> getLessOrEqualsByStudentsCount(int studentsCount) {
 
         List<Group> groups = new ArrayList<>();

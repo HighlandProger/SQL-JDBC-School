@@ -1,7 +1,8 @@
-package ua.com.foxminded.dao;
+package ua.com.foxminded.exception;
 
-@SuppressWarnings("serial")
 public class DAOException extends RuntimeException {
+
+    private static final long serialVersionUID = -944581676969714800L;
 
     public DAOException(String message, Exception cause) {
         super(message, cause);

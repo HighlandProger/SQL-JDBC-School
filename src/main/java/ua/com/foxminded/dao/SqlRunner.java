@@ -1,5 +1,8 @@
 package ua.com.foxminded.dao;
 
+import ua.com.foxminded.exception.DAOException;
+import ua.com.foxminded.exception.ReadFileException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,6 +10,7 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.MissingResourceException;
 
 public class SqlRunner {
 
@@ -14,40 +18,32 @@ public class SqlRunner {
 
     public void createTables() {
 
-        try (Connection connection = DAOFactory.getInstance().getConnection()) {
-            prepareStatements(connection);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+        String sql = readFile();
 
-    private String getTablesSql() {
-
-        StringBuilder sql = new StringBuilder();
-
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(TABLES_SQL_FILE_NAME)) {
-            if (inputStream == null) {
-                throw new IOException("Cannot get resource file stream");
-            }
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            while (reader.ready()) {
-                sql.append(reader.readLine());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return sql.toString();
-    }
-
-    private void prepareStatements(Connection connection) {
-
-        String tablesSql = getTablesSql();
-
-        try (PreparedStatement statement = connection.prepareStatement((tablesSql))) {
+        try (Connection connection = DAOFactory.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new DAOException("Cannot create tables", e);
         }
+    }
+
+    private String readFile() {
+
+        StringBuilder output = new StringBuilder();
+
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(TABLES_SQL_FILE_NAME)) {
+            if (inputStream == null) {
+                throw new MissingResourceException("Cannot read file", SqlRunner.class.getName(), TABLES_SQL_FILE_NAME);
+            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            while (reader.ready()) {
+                output.append(reader.readLine());
+            }
+        } catch (IOException e) {
+            throw new ReadFileException("Error during reading file");
+        }
+        return output.toString();
 
     }
 

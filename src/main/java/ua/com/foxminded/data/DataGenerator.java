@@ -2,7 +2,6 @@ package ua.com.foxminded.data;
 
 import ua.com.foxminded.dao.postgres.PostgresSqlCourseDAO;
 import ua.com.foxminded.dao.postgres.PostgresSqlGroupDAO;
-import ua.com.foxminded.dao.postgres.PostgresSqlStudentCourseDAO;
 import ua.com.foxminded.dao.postgres.PostgresSqlStudentDAO;
 import ua.com.foxminded.domain.Course;
 import ua.com.foxminded.domain.Group;
@@ -23,7 +22,6 @@ public class DataGenerator {
     private final PostgresSqlGroupDAO groupDAO = new PostgresSqlGroupDAO();
     private final PostgresSqlStudentDAO studentDAO = new PostgresSqlStudentDAO();
     private final PostgresSqlCourseDAO courseDAO = new PostgresSqlCourseDAO();
-    private final PostgresSqlStudentCourseDAO studentCourseDAO = new PostgresSqlStudentCourseDAO();
 
     public void generateData() {
         createGroups();
@@ -69,7 +67,7 @@ public class DataGenerator {
             List<Student> addedStudents = groupStudentsMap.get(randomGroup);
             if (addedStudents.size() == 30) {
                 for (Student studentInMap : addedStudents) {
-                    studentDAO.assignStudentToGroup(studentInMap, randomGroup);
+                    studentDAO.assignToGroup(studentInMap, randomGroup);
                 }
                 groupStudentsMap.remove(randomGroup);
                 i--;
@@ -81,7 +79,7 @@ public class DataGenerator {
 
         for (Map.Entry<Group, List<Student>> map : groupStudentsMap.entrySet()) {
             for (Student student : map.getValue()) {
-                studentDAO.assignStudentToGroup(student, map.getKey());
+                studentDAO.assignToGroup(student, map.getKey());
             }
         }
     }
@@ -94,7 +92,7 @@ public class DataGenerator {
             List<Course> courses = new ArrayList<>(courseDAO.getAll());
             for (int i = 0; i < randomCoursesCount; i++) {
                 Course randomCourse = courses.get(new Random().nextInt(courses.size()));
-                studentCourseDAO.assignCourseToStudent(randomCourse, student);
+                studentDAO.assignToCourse(randomCourse, student);
                 courses.remove(randomCourse);
             }
         }

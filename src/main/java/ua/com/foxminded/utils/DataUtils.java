@@ -8,6 +8,8 @@ import java.util.*;
 
 public class DataUtils {
 
+    private static final List<String> STUDENT_FIRST_NAMES = getStudentFirstNames();
+    private static final List<String> STUDENT_LAST_NAMES = getStudentLastNames();
     private static final int FIRST_UPPERCASE_LETTER_UNICODE = 65;
     private static final int ALPHABET_LETTERS_COUNT = 26;
     private static final String DASH = "-";
@@ -36,13 +38,13 @@ public class DataUtils {
 
     public static String getRandomStudentName() {
 
-        List<String> nameList = getStudentNames();
+        List<String> nameList = STUDENT_FIRST_NAMES;
         return nameList.get(new Random().nextInt(nameList.size()));
     }
 
     public static String getRandomStudentLastName() {
 
-        List<String> lastNameList = getStudentLastNames();
+        List<String> lastNameList = STUDENT_LAST_NAMES;
         return lastNameList.get(new Random().nextInt(lastNameList.size()));
     }
 
@@ -74,7 +76,7 @@ public class DataUtils {
         return courses;
     }
 
-    public static List<String> getStudentNames() {
+        public static List<String> getStudentFirstNames() {
         List<String> names = new ArrayList<>();
         names.add("John");
         names.add("Joe");

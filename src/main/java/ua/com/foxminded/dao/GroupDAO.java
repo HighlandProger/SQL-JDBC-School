@@ -9,4 +9,6 @@ public interface GroupDAO {
     void create(Group group);
 
     List<Group> getAll();
+
+    List<Group> getLessOrEqualsByStudentsCount(int studentsCount);
 }

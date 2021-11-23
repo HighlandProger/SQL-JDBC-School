@@ -1,5 +1,6 @@
 package ua.com.foxminded.dao;
 
+import ua.com.foxminded.domain.Course;
 import ua.com.foxminded.domain.Group;
 import ua.com.foxminded.domain.Student;
 
@@ -13,7 +14,13 @@ public interface StudentDAO {
 
     List<Student> getAll();
 
-    void assignStudentToGroup(Student student, Group group);
+    void assignToGroup(Student student, Group group);
 
     void delete(long id);
+
+    void assignToCourse(Course course, Student student);
+
+    List<Student> getByCourseName(String courseName);
+
+    void deleteCourseRelation(long studentId, long courseId);
 }

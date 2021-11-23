@@ -1,7 +1,7 @@
 package ua.com.foxminded.dao.postgres;
 
 import ua.com.foxminded.dao.CourseDAO;
-import ua.com.foxminded.dao.DAOException;
+import ua.com.foxminded.exception.DAOException;
 import ua.com.foxminded.dao.DAOFactory;
 import ua.com.foxminded.domain.Course;
 
@@ -47,7 +47,7 @@ public class PostgresSqlCourseDAO implements CourseDAO {
             }
 
         } catch (SQLException e) {
-            throw new DAOException("Cannot get groups", e);
+            throw new DAOException("Cannot get course", e);
         }
 
         return courses;
@@ -58,24 +58,17 @@ public class PostgresSqlCourseDAO implements CourseDAO {
 
         String sql = "SELECT * FROM courses WHERE id = ?;";
 
-        Course course = null;
-
         try (Connection connection = DAOFactory.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                course = createCourseFromResultSet(resultSet);
+            if (!resultSet.next()) {
+                throw new DAOException("Course is not found");
             }
+            return createCourseFromResultSet(resultSet);
         } catch (SQLException e) {
             throw new DAOException("Cannot get course by id", e);
         }
-
-        if (course == null) {
-            throw new DAOException("Group is not found");
-        }
-
-        return course;
     }
 
 

@@ -1,7 +1,8 @@
 package ua.com.foxminded.dao.postgres;
 
 import org.postgresql.util.PSQLException;
-import ua.com.foxminded.dao.DAOException;
+import ua.com.foxminded.domain.Course;
+import ua.com.foxminded.exception.DAOException;
 import ua.com.foxminded.dao.DAOFactory;
 import ua.com.foxminded.dao.StudentDAO;
 import ua.com.foxminded.domain.Group;
@@ -33,7 +34,7 @@ public class PostgresSqlStudentDAO implements StudentDAO {
     }
 
     @Override
-    public void assignStudentToGroup(Student student, Group group) {
+    public void assignToGroup(Student student, Group group) {
 
         String sql = "UPDATE students SET group_id = ? WHERE id = ?;";
 
@@ -104,6 +105,60 @@ public class PostgresSqlStudentDAO implements StudentDAO {
             statement.execute();
         } catch (SQLException e) {
             throw new DAOException("Cannot delete student", e);
+        }
+    }
+
+    @Override
+    public void assignToCourse(Course course, Student student) {
+
+        String sql = "INSERT INTO course_student (course_id, student_id) VALUES (?,?);";
+
+        try (Connection connection = DAOFactory.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, course.getId());
+            statement.setLong(2, student.getId());
+            statement.execute();
+        } catch (SQLException e) {
+            throw new DAOException("Cannot create course - student relationship", e);
+        }
+    }
+
+    @Override
+    public List<Student> getByCourseName(String courseName) {
+
+        List<Student> students = new ArrayList<>();
+        String sql = "SELECT s.* FROM students s, courses c, course_student cs " +
+            "WHERE s.id=cs.student_id AND c.id=cs.course_id " +
+            "GROUP BY s.id, c.id " +
+            "HAVING c.name=?;";
+
+        try (Connection connection = DAOFactory.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, courseName);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                students.add(new PostgresSqlStudentDAO().createStudentFromResultSet(resultSet));
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException("Cannot get students by course name", e);
+        }
+
+        return students;
+    }
+
+    @Override
+    public void deleteCourseRelation(long studentId, long courseId) {
+
+        String sql = "DELETE FROM course_student WHERE student_id=? AND course_id=?;";
+
+        try (Connection connection = DAOFactory.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, studentId);
+            statement.setLong(2, courseId);
+            statement.execute();
+        } catch (SQLException e) {
+            throw new DAOException("Cannot delete course - student relation", e);
         }
     }
 
