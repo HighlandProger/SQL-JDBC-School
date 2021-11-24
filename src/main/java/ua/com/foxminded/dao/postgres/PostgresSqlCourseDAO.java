@@ -1,9 +1,9 @@
 package ua.com.foxminded.dao.postgres;
 
 import ua.com.foxminded.dao.CourseDAO;
-import ua.com.foxminded.exception.DAOException;
 import ua.com.foxminded.dao.DAOFactory;
 import ua.com.foxminded.domain.Course;
+import ua.com.foxminded.exception.DAOException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -47,7 +47,7 @@ public class PostgresSqlCourseDAO implements CourseDAO {
             }
 
         } catch (SQLException e) {
-            throw new DAOException("Cannot get course", e);
+            throw new DAOException("Cannot get courses", e);
         }
 
         return courses;

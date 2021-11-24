@@ -6,16 +6,13 @@ import ua.com.foxminded.dao.postgres.PostgresSqlStudentDAO;
 import ua.com.foxminded.domain.Course;
 import ua.com.foxminded.domain.Group;
 import ua.com.foxminded.domain.Student;
-import ua.com.foxminded.utils.DataUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 public class DataGenerator {
 
-    private static final int COURSES_COUNT = 10;
     private static final int GROUPS_COUNT = 10;
     private static final int STUDENTS_COUNT = 200;
     private static final int MAX_ASSIGNED_COURSES_COUNT = 3;
@@ -27,8 +24,11 @@ public class DataGenerator {
         createGroups();
         createCourses();
         createStudents();
-        assignStudentsToGroups();
-        assignCoursesToStudents();
+        List<Group> groups = groupDAO.getAll();
+        List<Student> students = studentDAO.getAll();
+        List<Course> courses = courseDAO.getAll();
+        assignStudentsToGroups(students, groups);
+        assignStudentsToCourses(students, courses);
     }
 
     private void createGroups() {
@@ -49,18 +49,15 @@ public class DataGenerator {
 
     private void createCourses() {
 
-        List<Course> courses = DataUtils.getCoursesList();
-        for (int i = 0; i < COURSES_COUNT; i++) {
-            courseDAO.create(courses.get(i));
+        for (Course course : DataUtils.COURSE_LIST) {
+            courseDAO.create(course);
         }
     }
 
-    private void assignStudentsToGroups() {
+    private void assignStudentsToGroups(List<Student> students, List<Group> groups) {
 
-        List<Group> groups = groupDAO.getAll();
         Map<Group, List<Student>> groupStudentsMap = DataUtils.getEmptyGroupStudentsMap(groups);
 
-        List<Student> students = studentDAO.getAll();
         for (int i = 0; i < students.size(); i++) {
 
             Group randomGroup = DataUtils.getRandomGroupFromList(groups);
@@ -84,15 +81,13 @@ public class DataGenerator {
         }
     }
 
-    private void assignCoursesToStudents() {
+    private void assignStudentsToCourses(List<Student> students, List<Course> courses) {
 
-        List<Student> students = studentDAO.getAll();
         for (Student student : students) {
             int randomCoursesCount = new Random().nextInt(MAX_ASSIGNED_COURSES_COUNT);
-            List<Course> courses = new ArrayList<>(courseDAO.getAll());
             for (int i = 0; i < randomCoursesCount; i++) {
                 Course randomCourse = courses.get(new Random().nextInt(courses.size()));
-                studentDAO.assignToCourse(randomCourse, student);
+                studentDAO.assignToCourse(student, randomCourse);
                 courses.remove(randomCourse);
             }
         }

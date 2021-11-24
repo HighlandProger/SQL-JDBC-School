@@ -1,9 +1,9 @@
 package ua.com.foxminded.dao.postgres;
 
-import ua.com.foxminded.exception.DAOException;
 import ua.com.foxminded.dao.DAOFactory;
 import ua.com.foxminded.dao.GroupDAO;
 import ua.com.foxminded.domain.Group;
+import ua.com.foxminded.exception.DAOException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -68,7 +68,7 @@ public class PostgresSqlGroupDAO implements GroupDAO {
             }
 
         } catch (SQLException e) {
-            throw new DAOException("Cannot get group by students count", e);
+            throw new DAOException("Cannot get groups by students count", e);
         }
 
         return groups;

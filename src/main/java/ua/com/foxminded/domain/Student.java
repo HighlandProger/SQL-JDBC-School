@@ -2,12 +2,12 @@ package ua.com.foxminded.domain;
 
 public class Student {
 
-    private long id;
-    private long groupId;
     private final String name;
     private final String lastName;
+    private long id;
+    private Long groupId;
 
-    public Student(int id, int groupId, String name, String lastName) {
+    public Student(long id, Long groupId, String name, String lastName) {
         this.id = id;
         this.groupId = groupId;
         this.name = name;
@@ -25,6 +25,10 @@ public class Student {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public Long getGroupId(){
+        return groupId;
     }
 
     public String getName() {

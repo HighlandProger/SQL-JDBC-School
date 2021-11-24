@@ -18,9 +18,9 @@ public interface StudentDAO {
 
     void delete(long id);
 
-    void assignToCourse(Course course, Student student);
+    void assignToCourse(Student student, Course course);
 
     List<Student> getByCourseName(String courseName);
 
-    void deleteCourseRelation(long studentId, long courseId);
+    void unassignFromCourse(long studentId, long courseId);
 }

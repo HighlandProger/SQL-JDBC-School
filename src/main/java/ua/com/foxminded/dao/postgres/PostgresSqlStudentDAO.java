@@ -1,14 +1,17 @@
 package ua.com.foxminded.dao.postgres;
 
 import org.postgresql.util.PSQLException;
-import ua.com.foxminded.domain.Course;
-import ua.com.foxminded.exception.DAOException;
 import ua.com.foxminded.dao.DAOFactory;
 import ua.com.foxminded.dao.StudentDAO;
+import ua.com.foxminded.domain.Course;
 import ua.com.foxminded.domain.Group;
 import ua.com.foxminded.domain.Student;
+import ua.com.foxminded.exception.DAOException;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +28,7 @@ public class PostgresSqlStudentDAO implements StudentDAO {
         String sql = "INSERT INTO STUDENTS (name, lastName) VALUES (?,?);";
 
         try (Connection connection = DAOFactory.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             setStatementParameters(statement, student.getName(), student.getLastName());
             statement.execute();
         } catch (SQLException e) {
@@ -74,24 +77,17 @@ public class PostgresSqlStudentDAO implements StudentDAO {
 
         String sql = "SELECT * FROM students WHERE id = ?;";
 
-        Student student = null;
-
         try (Connection connection = DAOFactory.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                student = createStudentFromResultSet(resultSet);
+            if (!resultSet.next()) {
+                throw new DAOException("Student is not found");
             }
+            return createStudentFromResultSet(resultSet);
         } catch (SQLException e) {
             throw new DAOException("Cannot get student by id", e);
         }
-
-        if (student == null) {
-            throw new DAOException("Student with id = " + id + " is not found");
-        }
-
-        return student;
     }
 
     @Override
@@ -109,7 +105,7 @@ public class PostgresSqlStudentDAO implements StudentDAO {
     }
 
     @Override
-    public void assignToCourse(Course course, Student student) {
+    public void assignToCourse(Student student, Course course) {
 
         String sql = "INSERT INTO course_student (course_id, student_id) VALUES (?,?);";
 
@@ -119,7 +115,7 @@ public class PostgresSqlStudentDAO implements StudentDAO {
             statement.setLong(2, student.getId());
             statement.execute();
         } catch (SQLException e) {
-            throw new DAOException("Cannot create course - student relationship", e);
+            throw new DAOException("Cannot assign course to student", e);
         }
     }
 
@@ -128,16 +124,16 @@ public class PostgresSqlStudentDAO implements StudentDAO {
 
         List<Student> students = new ArrayList<>();
         String sql = "SELECT s.* FROM students s, courses c, course_student cs " +
-            "WHERE s.id=cs.student_id AND c.id=cs.course_id " +
-            "GROUP BY s.id, c.id " +
-            "HAVING c.name=?;";
+            "WHERE s.id=cs.student_id " +
+            "AND c.id=cs.course_id " +
+            "AND c.name=?;";
 
         try (Connection connection = DAOFactory.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, courseName);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                students.add(new PostgresSqlStudentDAO().createStudentFromResultSet(resultSet));
+                students.add(createStudentFromResultSet(resultSet));
             }
 
         } catch (SQLException e) {
@@ -148,7 +144,7 @@ public class PostgresSqlStudentDAO implements StudentDAO {
     }
 
     @Override
-    public void deleteCourseRelation(long studentId, long courseId) {
+    public void unassignFromCourse(long studentId, long courseId) {
 
         String sql = "DELETE FROM course_student WHERE student_id=? AND course_id=?;";
 
@@ -158,7 +154,7 @@ public class PostgresSqlStudentDAO implements StudentDAO {
             statement.setLong(2, courseId);
             statement.execute();
         } catch (SQLException e) {
-            throw new DAOException("Cannot delete course - student relation", e);
+            throw new DAOException("Cannot unassign student from course", e);
         }
     }
 
@@ -166,14 +162,14 @@ public class PostgresSqlStudentDAO implements StudentDAO {
 
         try {
             return new Student(
-                resultSet.getInt(ID),
-                resultSet.getInt(GROUP_ID),
+                resultSet.getLong(ID),
+                resultSet.getLong(GROUP_ID),
                 resultSet.getString(NAME),
                 resultSet.getString(LAST_NAME));
         } catch (PSQLException e) {
             return new Student(
-                resultSet.getInt(ID),
-                0,
+                resultSet.getLong(ID),
+                null,
                 resultSet.getString(NAME),
                 resultSet.getString(LAST_NAME));
         }

@@ -52,15 +52,15 @@ public class SQLMenuQueries {
     public void addStudentToTheCourseFromAList(long studentId, long courseId) {
         Student student = studentDAO.getById(studentId);
         Course course = courseDAO.getById(courseId);
-        studentDAO.assignToCourse(course, student);
+        studentDAO.assignToCourse(student, course);
     }
 
     public void removeStudentFromCourse(long studentId, long courseId) {
 
-        studentDAO.deleteCourseRelation(studentId, courseId);
+        studentDAO.unassignFromCourse(studentId, courseId);
     }
 
-    public List<Course> getCoursesList(){
+    public List<Course> getCoursesList() {
         return courseDAO.getAll();
     }
 }
