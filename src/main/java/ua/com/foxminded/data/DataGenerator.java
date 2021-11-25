@@ -7,6 +7,7 @@ import ua.com.foxminded.domain.Course;
 import ua.com.foxminded.domain.Group;
 import ua.com.foxminded.domain.Student;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -24,9 +25,11 @@ public class DataGenerator {
         createGroups();
         createCourses();
         createStudents();
-        List<Group> groups = groupDAO.getAll();
+
         List<Student> students = studentDAO.getAll();
+        List<Group> groups = groupDAO.getAll();
         List<Course> courses = courseDAO.getAll();
+
         assignStudentsToGroups(students, groups);
         assignStudentsToCourses(students, courses);
     }
@@ -81,10 +84,11 @@ public class DataGenerator {
         }
     }
 
-    private void assignStudentsToCourses(List<Student> students, List<Course> courses) {
+    private void assignStudentsToCourses(List<Student> students, List<Course> bufferedCoursesList) {
 
         for (Student student : students) {
             int randomCoursesCount = new Random().nextInt(MAX_ASSIGNED_COURSES_COUNT);
+            List<Course> courses = new ArrayList<>(bufferedCoursesList);
             for (int i = 0; i < randomCoursesCount; i++) {
                 Course randomCourse = courses.get(new Random().nextInt(courses.size()));
                 studentDAO.assignToCourse(student, randomCourse);

@@ -11,34 +11,17 @@ import java.util.List;
 
 public class SQLMenuQueries {
 
-    private static final String SPACE = " ";
     private final PostgresSqlGroupDAO groupDAO = new PostgresSqlGroupDAO();
     private final PostgresSqlStudentDAO studentDAO = new PostgresSqlStudentDAO();
     private final PostgresSqlCourseDAO courseDAO = new PostgresSqlCourseDAO();
 
-    public String findAllGroupsWithLessOrEqualsStudentCount(int studentCount) {
-        List<Group> groups = groupDAO.getLessOrEqualsByStudentsCount(studentCount);
-        StringBuilder builder = new StringBuilder();
-        for (Group group : groups) {
-            builder.append(group.getName())
-                .append("\n");
-        }
 
-        return builder.toString();
+    public List<Group> findAllGroupsWithLessOrEqualsStudentCount(int studentCount) {
+        return groupDAO.getLessOrEqualsByStudentsCount(studentCount);
     }
 
-    public String findAllStudentsRelatedToCourseWithGivenName(String courseName) {
-        List<Student> students = studentDAO.getByCourseName(courseName);
-
-        StringBuilder builder = new StringBuilder();
-        for (Student student : students) {
-            builder.append(student.getName())
-                .append(SPACE)
-                .append(student.getLastName())
-                .append("\n");
-        }
-
-        return builder.toString();
+    public List<Student> findAllStudentsRelatedToCourseWithGivenName(String courseName) {
+        return studentDAO.getByCourseName(courseName);
     }
 
     public void addNewStudent(String name, String lastName) {
