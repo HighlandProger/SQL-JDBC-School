@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.MissingResourceException;
 import java.util.Properties;
 
 public class DAOFactory {
@@ -29,23 +30,6 @@ public class DAOFactory {
         return instance;
     }
 
-    private static Properties getProperties() {
-
-        Properties properties = new Properties();
-
-        try (InputStream inputStream = DAOFactory.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME)) {
-            if (inputStream == null) {
-                throw new IOException("Cannot read database properties " + DAOFactory.class.getName() + " " + PROPERTIES_FILE_NAME);
-            }
-            properties.load(inputStream);
-
-        } catch (IOException e) {
-            throw new ReadFileException("Error during reading property file");
-        }
-
-        return properties;
-    }
-
     public Connection getConnection() throws SQLException {
 
         String url = PROPERTIES.getProperty(URL);
@@ -57,5 +41,22 @@ public class DAOFactory {
         }
 
         return DriverManager.getConnection(url, user, password);
+    }
+
+    private static Properties getProperties() {
+
+        Properties properties = new Properties();
+
+        try (InputStream inputStream = DAOFactory.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME)) {
+            if (inputStream == null) {
+                throw new MissingResourceException("Cannot read database properties", DAOFactory.class.getName(), PROPERTIES_FILE_NAME);
+            }
+            properties.load(inputStream);
+
+        } catch (IOException e) {
+            throw new ReadFileException("Error during reading property file");
+        }
+
+        return properties;
     }
 }

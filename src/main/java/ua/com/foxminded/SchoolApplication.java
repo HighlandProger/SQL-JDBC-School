@@ -2,7 +2,7 @@ package ua.com.foxminded;
 
 import ua.com.foxminded.dao.SqlRunner;
 import ua.com.foxminded.data.DataGenerator;
-import ua.com.foxminded.menu.ApplicationMenu;
+import ua.com.foxminded.menu.MainMenu;
 
 public class SchoolApplication {
     public static void main(String[] args) {
@@ -13,7 +13,7 @@ public class SchoolApplication {
         DataGenerator dataGenerator = new DataGenerator();
         dataGenerator.generateData();
 
-        ApplicationMenu menu = new ApplicationMenu();
+        MainMenu menu = new MainMenu();
         menu.runMenu();
 
     }

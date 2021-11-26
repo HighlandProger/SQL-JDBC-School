@@ -8,7 +8,7 @@ import java.util.*;
 
 public class DataUtils {
 
-    protected static final List<Course> COURSE_LIST = Arrays.asList(
+    static final List<Course> COURSE_LIST = Arrays.asList(
         new Course("math", "It's about calculating"),
         new Course("biology", "Anatomy, mamals, dinosaurs..."),
         new Course("chemists", "Don't try it at home"),
@@ -37,7 +37,7 @@ public class DataUtils {
     private DataUtils() {
     }
 
-    protected static String getRandomGroupName() {
+    static String getRandomGroupName() {
 
         return String.valueOf(
             getRandomUppercaseLetter()) +
@@ -47,23 +47,23 @@ public class DataUtils {
             new Random().nextInt(10);
     }
 
-    protected static Group getRandomGroupFromList(List<Group> groups) {
+    static Group getRandomGroupFromList(List<Group> groups) {
         return groups.get(new Random().nextInt(groups.size()));
     }
 
-    protected static String getRandomStudentName() {
+    static String getRandomStudentName() {
 
         List<String> nameList = STUDENT_FIRST_NAMES;
         return nameList.get(new Random().nextInt(nameList.size()));
     }
 
-    protected static String getRandomStudentLastName() {
+    static String getRandomStudentLastName() {
 
         List<String> lastNameList = STUDENT_LAST_NAMES;
         return lastNameList.get(new Random().nextInt(lastNameList.size()));
     }
 
-    protected static Map<Group, List<Student>> getEmptyGroupStudentsMap(List<Group> groups) {
+    static Map<Group, List<Student>> getEmptyGroupStudentsMap(List<Group> groups) {
 
         Map<Group, List<Student>> groupStudentsMap = new HashMap<>();
         for (Group group : groups) {

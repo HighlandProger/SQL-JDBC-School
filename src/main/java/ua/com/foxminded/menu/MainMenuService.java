@@ -9,12 +9,11 @@ import ua.com.foxminded.domain.Student;
 
 import java.util.List;
 
-public class SQLMenuQueries {
+public class MainMenuService {
 
     private final PostgresSqlGroupDAO groupDAO = new PostgresSqlGroupDAO();
     private final PostgresSqlStudentDAO studentDAO = new PostgresSqlStudentDAO();
     private final PostgresSqlCourseDAO courseDAO = new PostgresSqlCourseDAO();
-
 
     public List<Group> findAllGroupsWithLessOrEqualsStudentCount(int studentCount) {
         return groupDAO.getLessOrEqualsByStudentsCount(studentCount);
