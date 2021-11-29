@@ -4,6 +4,7 @@ import ua.com.foxminded.domain.Course;
 import ua.com.foxminded.domain.Group;
 import ua.com.foxminded.domain.Student;
 import ua.com.foxminded.exception.DAOException;
+import ua.com.foxminded.exception.MenuMainException;
 
 import java.util.List;
 import java.util.Scanner;
@@ -26,8 +27,7 @@ public class MainMenu {
 
         try {
             print(View.getMenu());
-            String inputString = readString();
-            int numberPosition = Integer.parseInt(inputString);
+            int numberPosition = readInt();
             processRequest(numberPosition);
         } catch (NumberFormatException e) {
             backToMainMenuRequest();
@@ -40,27 +40,26 @@ public class MainMenu {
     private void processRequest(int requestNumber) {
 
         switch (requestNumber) {
-            case (1):
+            case 1:
                 findGroupsByStudentCount();
                 break;
-            case (2):
+            case 2:
                 findStudentsByCourseName();
                 break;
-            case (3):
+            case 3:
                 addStudent();
                 break;
-            case (4):
+            case 4:
                 deleteStudentById();
                 break;
-            case (5):
+            case 5:
                 addStudentToTheCourse();
                 break;
-            case (6):
+            case 6:
                 removeStudentFromTheCourse();
                 break;
-            case (0):
-                closeMenu();
-                break;
+            case 0:
+                throw new IllegalStateException("Menu closed");
             default:
                 print(View.getValueError());
                 readEmptyString();
@@ -73,7 +72,7 @@ public class MainMenu {
     private void backToMainMenuRequest() {
         print(View.getBackToMainMenuRequest());
         try {
-            int request = Integer.parseInt(readString());
+            int request = readInt();
             if (request == 0) {
                 runMenu();
             } else {
@@ -92,7 +91,7 @@ public class MainMenu {
 
         try {
             print(View.getEnterMessage(STUDENT, COUNT_FIELD));
-            int studentsCount = Integer.parseInt(readString());
+            int studentsCount = readInt();
             List<Group> groups = queries.findAllGroupsWithLessOrEqualsStudentCount(studentsCount);
             print(View.getListPositions(groups));
         } catch (NumberFormatException e) {
@@ -140,7 +139,7 @@ public class MainMenu {
     private void deleteStudentById() {
 
         print(View.getEnterMessage(STUDENT, ID_FIELD));
-        long studentId = Long.parseLong(readString());
+        long studentId = readLong();
         queries.deleteStudentByStudentId(studentId);
         print(View.getDeletedStudent(studentId));
     }
@@ -150,9 +149,9 @@ public class MainMenu {
         List<Course> courseList = queries.getCoursesList();
         print(View.getListPositions(courseList));
         print(View.getEnterMessage(COURSE, ID_FIELD));
-        long courseId = Long.parseLong(readString());
+        long courseId = readLong();
         print(View.getEnterMessage(STUDENT, ID_FIELD));
-        long studentId = Long.parseLong(readString());
+        long studentId = readLong();
         try {
             queries.addStudentToTheCourseFromAList(studentId, courseId);
             print(View.getAddedStudentToCourse(studentId, courseId, false));
@@ -164,21 +163,28 @@ public class MainMenu {
     private void removeStudentFromTheCourse() {
 
         print(View.getEnterMessage(STUDENT, ID_FIELD));
-        long studentId = Long.parseLong(readString());
+        long studentId = readLong();
         print(View.getEnterMessage(COURSE, ID_FIELD));
-        long courseId = Long.parseLong(readString());
+        long courseId = readLong();
         queries.removeStudentFromCourse(studentId, courseId);
         print(View.getStudentRemovedFromCourse(studentId, courseId));
-    }
-
-    private void closeMenu() {
-        scanner.close();
-        throw new IllegalStateException();
     }
 
     private void readEmptyString() {
         readString();
         print(View.NEW_LINE);
+    }
+
+    private int readInt() {
+        if (MainMenu.scanner.hasNextInt()) {
+            return MainMenu.scanner.nextInt();
+        } else throw new MenuMainException("You entered a non-integer number");
+    }
+
+    private long readLong() {
+        if (MainMenu.scanner.hasNextLong()) {
+            return MainMenu.scanner.nextLong();
+        } else throw new MenuMainException("You entered a non-long number");
     }
 
     private String readString() {
