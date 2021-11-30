@@ -42,19 +42,11 @@ public class View {
         return builder.toString();
     }
 
-    static String getClosedMenu() {
-        return
-            NEW_LINE +
-                Message.MENU_CLOSED_MESSAGE;
-    }
-
     static String getBackToMainMenuRequest() {
 
         return
             NEW_LINE +
-                Message.BACK_TO_MAIN_MENU_MESSAGE +
-                NEW_LINE +
-                Message.ENTER_REQUEST_NUMBER_MESSAGE;
+                Message.RETURN_TO_MAIN_MENU_MESSAGE;
     }
 
     static String getValueError() {
@@ -109,7 +101,7 @@ public class View {
                 }
             }
         } catch (IndexOutOfBoundsException e) {
-            builder.append(Message.NO_SUCH_OBJECTS_MESSAGE);
+            builder.append(Message.NO_SUCH_OBJECTS_MESSAGE).append(NEW_LINE);
         }
         return builder.toString();
     }

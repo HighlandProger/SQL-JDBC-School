@@ -4,7 +4,7 @@ import ua.com.foxminded.domain.Course;
 import ua.com.foxminded.domain.Group;
 import ua.com.foxminded.domain.Student;
 import ua.com.foxminded.exception.DAOException;
-import ua.com.foxminded.exception.MenuMainException;
+import ua.com.foxminded.exception.MainMenuException;
 
 import java.util.List;
 import java.util.Scanner;
@@ -18,95 +18,69 @@ public class MainMenu {
     private static final String LAST_NAME_FIELD = "last name";
     private static final String COUNT_FIELD = "count";
     private static final String ID_FIELD = "id";
-
-    private static final Scanner scanner = new Scanner(System.in);
-
-    private final MainMenuService queries = new MainMenuService();
+    private final MainMenuService mainMenuService = new MainMenuService();
+    private Scanner scanner = new Scanner(System.in);
 
     public void runMenu() {
 
         try {
             print(View.getMenu());
-            int numberPosition = readInt();
-            processRequest(numberPosition);
-        } catch (NumberFormatException e) {
-            backToMainMenuRequest();
+            processRequest();
+        } catch (MainMenuException e) {
             runMenu();
-        } catch (IllegalStateException e) {
-            print(View.getClosedMenu());
         }
     }
 
-    private void processRequest(int requestNumber) {
+    private void processRequest() {
 
-        switch (requestNumber) {
-            case 1:
-                findGroupsByStudentCount();
-                break;
-            case 2:
-                findStudentsByCourseName();
-                break;
-            case 3:
-                addStudent();
-                break;
-            case 4:
-                deleteStudentById();
-                break;
-            case 5:
-                addStudentToTheCourse();
-                break;
-            case 6:
-                removeStudentFromTheCourse();
-                break;
-            case 0:
-                throw new IllegalStateException("Menu closed");
-            default:
-                print(View.getValueError());
-                readEmptyString();
-                runMenu();
-                break;
-        }
-        backToMainMenuRequest();
-    }
-
-    private void backToMainMenuRequest() {
-        print(View.getBackToMainMenuRequest());
+        print(View.getMenu());
         try {
-            int request = readInt();
-            if (request == 0) {
-                runMenu();
-            } else {
-                print(View.getValueError());
-                readEmptyString();
-                backToMainMenuRequest();
+            int requestNumber = readInt();
+            switch (requestNumber) {
+                case 1:
+                    findGroupsByStudentCount();
+                    break;
+                case 2:
+                    findStudentsByCourseName();
+                    break;
+                case 3:
+                    addStudent();
+                    break;
+                case 4:
+                    deleteStudentById();
+                    break;
+                case 5:
+                    addStudentToTheCourse();
+                    break;
+                case 6:
+                    removeStudentFromTheCourse();
+                    break;
+                case 0:
+                    System.exit(0);
+                    break;
+                default:
+                    break;
             }
-        } catch (NumberFormatException e) {
-            print(View.getValueError());
-            readEmptyString();
             backToMainMenuRequest();
+        } catch (MainMenuException e) {
+            System.out.println(e.getMessage());
+            System.exit(0);
         }
     }
 
     private void findGroupsByStudentCount() {
 
-        try {
-            print(View.getEnterMessage(STUDENT, COUNT_FIELD));
-            int studentsCount = readInt();
-            List<Group> groups = queries.findAllGroupsWithLessOrEqualsStudentCount(studentsCount);
-            print(View.getListPositions(groups));
-        } catch (NumberFormatException e) {
-            print(View.getValueError());
-            readEmptyString();
-            findGroupsByStudentCount();
-        }
+        print(View.getEnterMessage(STUDENT, COUNT_FIELD));
+        List<Group> groups = mainMenuService.findAllGroupsWithLessOrEqualsStudentCount(readInt());
+        print(View.getListPositions(groups));
     }
 
     private void findStudentsByCourseName() {
 
         print(View.getEnterMessage(COURSE, NAME_FIELD));
-        String courseName = readString();
-        List<Student> students = queries.findAllStudentsRelatedToCourseWithGivenName(courseName);
+        List<Student> students = mainMenuService.findAllStudentsRelatedToCourseWithGivenName(readString());
         print(View.getListPositions(students));
+
     }
 
     private void addStudent() {
@@ -132,7 +106,7 @@ public class MainMenu {
                 break;
             }
         }
-        queries.addNewStudent(name, lastName);
+        mainMenuService.addNewStudent(name, lastName);
         print(View.getAddedStudent(name, lastName));
     }
 
@@ -140,20 +114,20 @@ public class MainMenu {
 
         print(View.getEnterMessage(STUDENT, ID_FIELD));
         long studentId = readLong();
-        queries.deleteStudentByStudentId(studentId);
+        mainMenuService.deleteStudentByStudentId(studentId);
         print(View.getDeletedStudent(studentId));
     }
 
     private void addStudentToTheCourse() {
 
-        List<Course> courseList = queries.getCoursesList();
+        List<Course> courseList = mainMenuService.getCoursesList();
         print(View.getListPositions(courseList));
         print(View.getEnterMessage(COURSE, ID_FIELD));
         long courseId = readLong();
         print(View.getEnterMessage(STUDENT, ID_FIELD));
         long studentId = readLong();
         try {
-            queries.addStudentToTheCourseFromAList(studentId, courseId);
+            mainMenuService.addStudentToTheCourseFromAList(studentId, courseId);
             print(View.getAddedStudentToCourse(studentId, courseId, false));
         } catch (DAOException e) {
             print(View.getAddedStudentToCourse(studentId, courseId, true));
@@ -166,28 +140,33 @@ public class MainMenu {
         long studentId = readLong();
         print(View.getEnterMessage(COURSE, ID_FIELD));
         long courseId = readLong();
-        queries.removeStudentFromCourse(studentId, courseId);
+        mainMenuService.removeStudentFromCourse(studentId, courseId);
         print(View.getStudentRemovedFromCourse(studentId, courseId));
     }
 
-    private void readEmptyString() {
+    private void backToMainMenuRequest() {
+
+        print(View.getBackToMainMenuRequest());
         readString();
-        print(View.NEW_LINE);
+        runMenu();
     }
 
     private int readInt() {
-        if (MainMenu.scanner.hasNextInt()) {
-            return MainMenu.scanner.nextInt();
-        } else throw new MenuMainException("You entered a non-integer number");
+        this.scanner = new Scanner(System.in);
+        if (scanner.hasNextInt()) {
+            return scanner.nextInt();
+        } else throw new MainMenuException("You entered a non-integer number");
     }
 
     private long readLong() {
-        if (MainMenu.scanner.hasNextLong()) {
-            return MainMenu.scanner.nextLong();
-        } else throw new MenuMainException("You entered a non-long number");
+        this.scanner = new Scanner(System.in);
+        if (scanner.hasNextLong()) {
+            return scanner.nextLong();
+        } else throw new MainMenuException("You entered a non-long number");
     }
 
     private String readString() {
+        this.scanner = new Scanner(System.in);
         return scanner.nextLine();
     }
 
