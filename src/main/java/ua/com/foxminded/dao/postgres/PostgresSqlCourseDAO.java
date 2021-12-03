@@ -5,10 +5,7 @@ import ua.com.foxminded.dao.DAOFactory;
 import ua.com.foxminded.domain.Course;
 import ua.com.foxminded.exception.DAOException;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,14 +16,19 @@ public class PostgresSqlCourseDAO implements CourseDAO {
     private static final String DESCRIPTION = "description";
 
     @Override
-    public void create(Course course) {
+    public Course create(Course course) {
 
-        String sql = "INSERT INTO courses (name, description) VALUES (?, ?);";
+        String sql = "INSERT INTO courses (name, description) VALUES (?, ?) RETURNING courses.*;";
 
         try (Connection connection = DAOFactory.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             setStatementParameters(statement, course.getName(), course.getDescription());
             statement.execute();
+            ResultSet resultSet = statement.getResultSet();
+            if (!resultSet.next()) {
+                throw new DAOException("Course is not found");
+            }
+            return createCourseFromResultSet(resultSet);
         } catch (SQLException e) {
             throw new DAOException("Cannot create course", e);
         }

@@ -10,7 +10,7 @@ public class DataUtils {
 
     static final List<Course> COURSE_LIST = Arrays.asList(
         new Course("math", "It's about calculating"),
-        new Course("biology", "Anatomy, mamals, dinosaurs..."),
+        new Course("biology", "Anatomy, mammals, dinosaurs..."),
         new Course("chemists", "Don't try it at home"),
         new Course("history", "It was rewritten too many times"),
         new Course("physics", "Very cool course. Be careful with electricity"),

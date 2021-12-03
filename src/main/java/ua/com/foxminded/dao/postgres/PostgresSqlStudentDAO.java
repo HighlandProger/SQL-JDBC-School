@@ -18,19 +18,24 @@ import java.util.List;
 public class PostgresSqlStudentDAO implements StudentDAO {
 
     private static final String ID = "id";
-    private static final String GROUP_ID = "groupId";
+    private static final String GROUP_ID = "group_Id";
     private static final String NAME = "name";
     private static final String LAST_NAME = "lastName";
 
     @Override
-    public void create(Student student) {
+    public Student create(Student student) {
 
-        String sql = "INSERT INTO STUDENTS (name, lastName) VALUES (?,?);";
+        String sql = "INSERT INTO STUDENTS (name, lastName) VALUES (?,?)  RETURNING students.*;;";
 
         try (Connection connection = DAOFactory.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             setStatementParameters(statement, student.getName(), student.getLastName());
             statement.execute();
+            ResultSet resultSet = statement.getResultSet();
+            if (!resultSet.next()) {
+                throw new DAOException("Student is not found");
+            }
+            return createStudentFromResultSet(resultSet);
         } catch (SQLException e) {
             throw new DAOException("Cannot create student", e);
         }
@@ -107,7 +112,7 @@ public class PostgresSqlStudentDAO implements StudentDAO {
     @Override
     public void assignToCourse(Student student, Course course) {
 
-        String sql = "INSERT INTO course_student (course_id, student_id) VALUES (?,?);";
+        String sql = "INSERT INTO course_student (course_id, student_id) VALUES (?,?)";
 
         try (Connection connection = DAOFactory.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {

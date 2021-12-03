@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface GroupDAO {
 
-    void create(Group group);
+    Group create(Group group);
 
     List<Group> getAll();
 

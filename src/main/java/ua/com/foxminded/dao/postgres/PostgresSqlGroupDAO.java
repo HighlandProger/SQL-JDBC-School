@@ -18,14 +18,19 @@ public class PostgresSqlGroupDAO implements GroupDAO {
     private static final String NAME = "name";
 
     @Override
-    public void create(Group group) {
+    public Group create(Group group) {
 
-        String sql = "INSERT INTO groups (name) VALUES (?);";
+        String sql = "INSERT INTO groups (name) VALUES (?) RETURNING groups.*;";
 
         try (Connection connection = DAOFactory.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             setStatementParameters(statement, group.getName());
             statement.execute();
+            ResultSet resultSet = statement.getResultSet();
+            if (!resultSet.next()) {
+                throw new DAOException("Group is not found");
+            }
+            return createGroupFromResultSet(resultSet);
         } catch (SQLException e) {
             throw new DAOException("Cannot create group", e);
         }

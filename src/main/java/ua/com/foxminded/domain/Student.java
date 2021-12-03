@@ -1,5 +1,7 @@
 package ua.com.foxminded.domain;
 
+import java.util.Objects;
+
 public class Student {
 
     private final String name;
@@ -39,4 +41,19 @@ public class Student {
         return lastName;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Student)) return false;
+        Student student = (Student) o;
+        return id == student.id &&
+            name.equals(student.name) &&
+            lastName.equals(student.lastName) &&
+            Objects.equals(groupId, student.groupId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, lastName, id, groupId);
+    }
 }

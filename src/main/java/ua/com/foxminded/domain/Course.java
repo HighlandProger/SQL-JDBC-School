@@ -1,5 +1,7 @@
 package ua.com.foxminded.domain;
 
+import java.util.Objects;
+
 public class Course {
 
     private long id;
@@ -33,4 +35,18 @@ public class Course {
         return description;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Course)) return false;
+        Course course = (Course) o;
+        return id == course.id &&
+            name.equals(course.name) &&
+            description.equals(course.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description);
+    }
 }

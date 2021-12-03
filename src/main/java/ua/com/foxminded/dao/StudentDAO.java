@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface StudentDAO {
 
-    void create(Student student);
+    Student create(Student student);
 
     Student getById(long id);
 
