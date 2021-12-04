@@ -1,54 +1,71 @@
 package ua.com.foxminded.dao;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ua.com.foxminded.dao.postgres.PostgresSqlCourseDAO;
 import ua.com.foxminded.domain.Course;
+import ua.com.foxminded.exception.DAOException;
 
-import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CourseDAOTest {
 
     private final SqlRunner sqlRunner = new SqlRunner();
     private final PostgresSqlCourseDAO courseDAO = new PostgresSqlCourseDAO();
+    private Course expectedCourse;
+    private Course actualCourse;
+
+    @BeforeEach
+    void initTables() {
+
+        sqlRunner.createTables();
+        assertEquals(0, courseDAO.getAll().size());
+    }
 
     @Test
     void create() {
 
-        sqlRunner.createTables();
-        Course actualCourse = courseDAO.create(new Course("math", "Algebra, Geometry"));
-        Course expectedCourse = new Course(1, "math", "Algebra, Geometry");
+        expectedCourse = TestUtils.getCourse();
+        actualCourse = courseDAO.create(TestUtils.getCourse());
+
         assertEquals(expectedCourse, actualCourse);
     }
 
     @Test
     void getById() {
 
-        sqlRunner.createTables();
-        Course expectedCourse = new Course(1, "math", "Algebra, Geometry");
+        expectedCourse = TestUtils.getCourse();
         courseDAO.create(expectedCourse);
-        Course actualCourse = courseDAO.getById(expectedCourse.getId());
+        actualCourse = courseDAO.getById(expectedCourse.getId());
+
         assertEquals(expectedCourse, actualCourse);
+    }
+
+    @Test
+    void getById_shouldThrowDAOException_whenIdIsAbsent() {
+
+        long randomId = 2;
+        Exception exception = assertThrows(DAOException.class,
+            () -> courseDAO.getById(randomId));
+
+        String expectedExceptionString = "Course is not found";
+        String actualExceptionString = exception.getMessage();
+
+        assertEquals(expectedExceptionString, actualExceptionString);
     }
 
     @Test
     void getAll() {
 
-        sqlRunner.createTables();
-        List<Course> expectedCourses = Arrays.asList(
-            new Course(1, "math", "Algebra, Geometry"),
-            new Course(2, "biology", "Anatomy, mammals, dinosaurs..."),
-            new Course(3, "chemists", "Don't try it at home"),
-            new Course(4, "history", "It was rewritten too many times"),
-            new Course(5,"physics", "Very cool course. Be careful with electricity"));
-
-        for (Course course : expectedCourses){
+        List<Course> expectedCourses = TestUtils.getCourses();
+        for (Course course : expectedCourses) {
             courseDAO.create(course);
         }
-
         List<Course> actualCourses = courseDAO.getAll();
+
         assertEquals(expectedCourses, actualCourses);
     }
 }

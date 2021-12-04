@@ -1,5 +1,6 @@
 package ua.com.foxminded.dao;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ua.com.foxminded.dao.postgres.PostgresSqlCourseDAO;
 import ua.com.foxminded.dao.postgres.PostgresSqlGroupDAO;
@@ -7,11 +8,12 @@ import ua.com.foxminded.dao.postgres.PostgresSqlStudentDAO;
 import ua.com.foxminded.domain.Course;
 import ua.com.foxminded.domain.Group;
 import ua.com.foxminded.domain.Student;
+import ua.com.foxminded.exception.DAOException;
 
-import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class StudentDAOTest {
 
@@ -19,50 +21,67 @@ class StudentDAOTest {
     private final PostgresSqlStudentDAO studentDAO = new PostgresSqlStudentDAO();
     private final PostgresSqlGroupDAO groupDAO = new PostgresSqlGroupDAO();
     private final PostgresSqlCourseDAO courseDAO = new PostgresSqlCourseDAO();
+    private Student expectedStudent;
+    private Student actualStudent;
+    private List<Student> expectedStudents;
+    private List<Student> actualStudents;
+
+    @BeforeEach
+    void initTables() {
+
+        sqlRunner.createTables();
+        assertEquals(0, studentDAO.getAll().size());
+    }
 
     @Test
     void create() {
 
-        sqlRunner.createTables();
-        Student expectedStudent = new Student(1, null, "John", "Evans");
-        Student actualStudent = studentDAO.create(expectedStudent);
+        expectedStudent = TestUtils.getStudent();
+        actualStudent = studentDAO.create(expectedStudent);
+
         assertEquals(expectedStudent, actualStudent);
     }
 
     @Test
     void getById() {
 
-        sqlRunner.createTables();
-        Student expectedStudent = new Student(1, null, "John", "Evans");
+        expectedStudent = TestUtils.getStudent();
         studentDAO.create(expectedStudent);
-        Student actualStudent = studentDAO.getById(expectedStudent.getId());
+        actualStudent = studentDAO.getById(expectedStudent.getId());
+
         assertEquals(expectedStudent, actualStudent);
+    }
+
+    @Test
+    void getById_shouldThrowDAOException_whenIdIsAbsent() {
+
+        long randomId = 2;
+        Exception exception = assertThrows(DAOException.class,
+            () -> studentDAO.getById(randomId));
+
+        String expectedExceptionString = "Student is not found";
+        String actualExceptionString = exception.getMessage();
+
+        assertEquals(expectedExceptionString, actualExceptionString);
     }
 
     @Test
     void getAll() {
 
-        sqlRunner.createTables();
-        List<Student> expectedStudents = Arrays.asList(
-            new Student(1, null, "Elly", "Goldman"),
-            new Student(2, null, "John", "Evans"),
-            new Student(3, null, "Jack", "Richer"),
-            new Student(4, null, "Tom", "Hanks"));
-
-        for (Student student : expectedStudents){
+        expectedStudents = TestUtils.getStudentsWithoutGroupId();
+        for (Student student : expectedStudents) {
             studentDAO.create(student);
         }
+        actualStudents = studentDAO.getAll();
 
-        List<Student> actualStudents = studentDAO.getAll();
         assertEquals(expectedStudents, actualStudents);
     }
 
     @Test
     void assignToGroup() {
 
-        sqlRunner.createTables();
-        Student student = studentDAO.create(new Student(1, null, "Jack", "Johnson"));
-        Group group = groupDAO.create(new Group(1, "ED-34"));
+        Student student = studentDAO.create(TestUtils.getStudent());
+        Group group = groupDAO.create(TestUtils.getGroup());
         studentDAO.assignToGroup(student, group);
         Long expectedGroupId = group.getId();
         Long actualGroupId = studentDAO.getById(student.getId()).getGroupId();
@@ -72,27 +91,52 @@ class StudentDAOTest {
     @Test
     void delete() {
 
-        sqlRunner.createTables();
-        studentDAO.create(new Student(1, null, "Joe", "Blind"));
-        studentDAO.delete(1);
-        int expectedStudentsCount = 0;
-        int actualStudentsCount = studentDAO.getAll().size();
-        assertEquals(expectedStudentsCount, actualStudentsCount);
+        Student student = studentDAO.create(TestUtils.getStudent());
+        int expectedStudentsCountBefore = 1;
+        int actualStudentsCountBefore = studentDAO.getAll().size();
+        assertEquals(expectedStudentsCountBefore, actualStudentsCountBefore);
+
+        studentDAO.delete(student.getId());
+        int expectedStudentsCountAfter = 0;
+        int actualStudentsCountAfter = studentDAO.getAll().size();
+
+        assertEquals(expectedStudentsCountAfter, actualStudentsCountAfter);
     }
 
-//    @Test
-//    void assignToCourse() {
-//        Student student = studentDAO.create(new Student(1, null, "Jack", "Johnson"));
-//        Course course = courseDAO.create(new Course(1, "math", "Algebra, Geometry"));
-//        studentDAO.assignToCourse(student, course);
-//
-//    }
+    @Test
+    void assignToCourse() {
+
+        expectedStudent = studentDAO.create(TestUtils.getStudent());
+        Course course = courseDAO.create(TestUtils.getCourse());
+        studentDAO.assignToCourse(expectedStudent, course);
+        List<Student> assignedStudents = studentDAO.getByCourseName(course.getName());
+        actualStudent = assignedStudents.get(0);
+
+        assertEquals(expectedStudent, actualStudent);
+    }
 
     @Test
     void getByCourseName() {
+
+        Course course = courseDAO.create(TestUtils.getCourse());
+        expectedStudents = TestUtils.getStudentsWithoutGroupId();
+        for (Student student : expectedStudents) {
+            studentDAO.create(student);
+            studentDAO.assignToCourse(student, course);
+        }
+        actualStudents = studentDAO.getByCourseName(course.getName());
+
+        assertEquals(expectedStudents, actualStudents);
     }
 
     @Test
     void unassignFromCourse() {
+
+        Student student = studentDAO.create(TestUtils.getStudent());
+        Course course = courseDAO.create(TestUtils.getCourse());
+        studentDAO.assignToCourse(student, course);
+        studentDAO.unassignFromCourse(student.getId(), course.getId());
+
+        assertEquals(0, studentDAO.getByCourseName(course.getName()).size());
     }
 }

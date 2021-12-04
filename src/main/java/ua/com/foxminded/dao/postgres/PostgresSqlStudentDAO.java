@@ -166,17 +166,19 @@ public class PostgresSqlStudentDAO implements StudentDAO {
     protected Student createStudentFromResultSet(ResultSet resultSet) throws SQLException {
 
         try {
-            return new Student(
+            Student student = new Student(
                 resultSet.getLong(ID),
                 resultSet.getLong(GROUP_ID),
                 resultSet.getString(NAME),
                 resultSet.getString(LAST_NAME));
+
+            if (student.getGroupId() == 0){
+                student.setGroupId(null);
+            }
+
+            return student;
         } catch (PSQLException e) {
-            return new Student(
-                resultSet.getLong(ID),
-                null,
-                resultSet.getString(NAME),
-                resultSet.getString(LAST_NAME));
+            throw new DAOException("Cannot create student from result set");
         }
 
     }
