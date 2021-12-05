@@ -9,7 +9,6 @@ import ua.com.foxminded.exception.DAOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CourseDAOTest {
 
@@ -22,14 +21,14 @@ class CourseDAOTest {
     void initTables() {
 
         sqlRunner.createTables();
-        assertEquals(0, courseDAO.getAll().size());
     }
 
     @Test
     void create() {
 
-        expectedCourse = TestUtils.getCourse();
-        actualCourse = courseDAO.create(TestUtils.getCourse());
+        assertEquals(0, courseDAO.getAll().size());
+        expectedCourse = TestUtils.createCourse(1, "math", "Algebra, Geometry");
+        actualCourse = courseDAO.create(expectedCourse);
 
         assertEquals(expectedCourse, actualCourse);
     }
@@ -37,7 +36,8 @@ class CourseDAOTest {
     @Test
     void getById() {
 
-        expectedCourse = TestUtils.getCourse();
+        assertEquals(0, courseDAO.getAll().size());
+        expectedCourse = TestUtils.createCourse(1, "math", "Algebra, Geometry");
         courseDAO.create(expectedCourse);
         actualCourse = courseDAO.getById(expectedCourse.getId());
 
@@ -47,20 +47,23 @@ class CourseDAOTest {
     @Test
     void getById_shouldThrowDAOException_whenIdIsAbsent() {
 
+        assertEquals(0, courseDAO.getAll().size());
         long randomId = 2;
-        Exception exception = assertThrows(DAOException.class,
-            () -> courseDAO.getById(randomId));
+        try {
+            courseDAO.getById(randomId);
+        } catch (DAOException e) {
+            String expectedExceptionString = "Course is not found";
+            String actualExceptionString = e.getMessage();
 
-        String expectedExceptionString = "Course is not found";
-        String actualExceptionString = exception.getMessage();
-
-        assertEquals(expectedExceptionString, actualExceptionString);
+            assertEquals(expectedExceptionString, actualExceptionString);
+        }
     }
 
     @Test
     void getAll() {
 
-        List<Course> expectedCourses = TestUtils.getCourses();
+        assertEquals(0, courseDAO.getAll().size());
+        List<Course> expectedCourses = TestUtils.getFiveRandomCourses();
         for (Course course : expectedCourses) {
             courseDAO.create(course);
         }

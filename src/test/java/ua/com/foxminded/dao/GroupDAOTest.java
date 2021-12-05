@@ -21,13 +21,13 @@ class GroupDAOTest {
     void initTables() {
 
         sqlRunner.createTables();
-        assertEquals(0, groupDAO.getAll().size());
     }
 
     @Test
     void create() {
 
-        Group expectedGroup = TestUtils.getGroup();
+        assertEquals(0, groupDAO.getAll().size());
+        Group expectedGroup = TestUtils.createGroup(1, "AB-10");
         Group actualGroup = groupDAO.create(expectedGroup);
 
         assertEquals(expectedGroup, actualGroup);
@@ -36,7 +36,8 @@ class GroupDAOTest {
     @Test
     void getAll() {
 
-        List<Group> expectedGroups = TestUtils.getGroups();
+        assertEquals(0, groupDAO.getAll().size());
+        List<Group> expectedGroups = TestUtils.getFiveRandomGroups();
         for (Group group : expectedGroups) {
             groupDAO.create(group);
         }
@@ -48,8 +49,9 @@ class GroupDAOTest {
     @Test
     void getLessOrEqualsByStudentsCount() {
 
-        List<Student> students = TestUtils.getStudentsWithoutGroupId();
-        List<Group> groups = TestUtils.getGroups();
+        assertEquals(0, groupDAO.getAll().size());
+        List<Student> students = TestUtils.getFiveRandomStudentsWithoutGroupId();
+        List<Group> groups = TestUtils.getFiveRandomGroups();
         for (Student student : students) {
             studentDAO.create(student);
         }

@@ -13,7 +13,6 @@ import ua.com.foxminded.exception.DAOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class StudentDAOTest {
 
@@ -30,13 +29,13 @@ class StudentDAOTest {
     void initTables() {
 
         sqlRunner.createTables();
-        assertEquals(0, studentDAO.getAll().size());
     }
 
     @Test
     void create() {
 
-        expectedStudent = TestUtils.getStudent();
+        assertEquals(0, studentDAO.getAll().size());
+        expectedStudent = TestUtils.createStudent(1, null, "Jack", "Richer");
         actualStudent = studentDAO.create(expectedStudent);
 
         assertEquals(expectedStudent, actualStudent);
@@ -45,7 +44,8 @@ class StudentDAOTest {
     @Test
     void getById() {
 
-        expectedStudent = TestUtils.getStudent();
+        assertEquals(0, studentDAO.getAll().size());
+        expectedStudent = TestUtils.createStudent(1, null, "Jack", "Richer");
         studentDAO.create(expectedStudent);
         actualStudent = studentDAO.getById(expectedStudent.getId());
 
@@ -55,20 +55,23 @@ class StudentDAOTest {
     @Test
     void getById_shouldThrowDAOException_whenIdIsAbsent() {
 
+        assertEquals(0, studentDAO.getAll().size());
         long randomId = 2;
-        Exception exception = assertThrows(DAOException.class,
-            () -> studentDAO.getById(randomId));
+        try {
+            studentDAO.getById(randomId);
+        } catch (DAOException e) {
+            String expectedExceptionString = "Student is not found";
+            String actualExceptionString = e.getMessage();
 
-        String expectedExceptionString = "Student is not found";
-        String actualExceptionString = exception.getMessage();
-
-        assertEquals(expectedExceptionString, actualExceptionString);
+            assertEquals(expectedExceptionString, actualExceptionString);
+        }
     }
 
     @Test
     void getAll() {
 
-        expectedStudents = TestUtils.getStudentsWithoutGroupId();
+        assertEquals(0, studentDAO.getAll().size());
+        expectedStudents = TestUtils.getFiveRandomStudentsWithoutGroupId();
         for (Student student : expectedStudents) {
             studentDAO.create(student);
         }
@@ -80,8 +83,9 @@ class StudentDAOTest {
     @Test
     void assignToGroup() {
 
-        Student student = studentDAO.create(TestUtils.getStudent());
-        Group group = groupDAO.create(TestUtils.getGroup());
+        assertEquals(0, studentDAO.getAll().size());
+        Student student = studentDAO.create(TestUtils.createStudent(1, null, "Jack", "Richer"));
+        Group group = groupDAO.create(TestUtils.createGroup(1, "AB-10"));
         studentDAO.assignToGroup(student, group);
         Long expectedGroupId = group.getId();
         Long actualGroupId = studentDAO.getById(student.getId()).getGroupId();
@@ -91,7 +95,8 @@ class StudentDAOTest {
     @Test
     void delete() {
 
-        Student student = studentDAO.create(TestUtils.getStudent());
+        assertEquals(0, studentDAO.getAll().size());
+        Student student = studentDAO.create(TestUtils.createStudent(1, null, "Jack", "Richer"));
         int expectedStudentsCountBefore = 1;
         int actualStudentsCountBefore = studentDAO.getAll().size();
         assertEquals(expectedStudentsCountBefore, actualStudentsCountBefore);
@@ -106,8 +111,9 @@ class StudentDAOTest {
     @Test
     void assignToCourse() {
 
-        expectedStudent = studentDAO.create(TestUtils.getStudent());
-        Course course = courseDAO.create(TestUtils.getCourse());
+        assertEquals(0, studentDAO.getAll().size());
+        expectedStudent = studentDAO.create(TestUtils.createStudent(1, null, "Jack", "Richer"));
+        Course course = courseDAO.create(TestUtils.createCourse(1, "math", "Algebra, Geometry"));
         studentDAO.assignToCourse(expectedStudent, course);
         List<Student> assignedStudents = studentDAO.getByCourseName(course.getName());
         actualStudent = assignedStudents.get(0);
@@ -118,8 +124,9 @@ class StudentDAOTest {
     @Test
     void getByCourseName() {
 
-        Course course = courseDAO.create(TestUtils.getCourse());
-        expectedStudents = TestUtils.getStudentsWithoutGroupId();
+        assertEquals(0, studentDAO.getAll().size());
+        Course course = courseDAO.create(TestUtils.createCourse(1, "math", "Algebra, Geometry"));
+        expectedStudents = TestUtils.getFiveRandomStudentsWithoutGroupId();
         for (Student student : expectedStudents) {
             studentDAO.create(student);
             studentDAO.assignToCourse(student, course);
@@ -132,8 +139,9 @@ class StudentDAOTest {
     @Test
     void unassignFromCourse() {
 
-        Student student = studentDAO.create(TestUtils.getStudent());
-        Course course = courseDAO.create(TestUtils.getCourse());
+        assertEquals(0, studentDAO.getAll().size());
+        Student student = studentDAO.create(TestUtils.createStudent(1, null, "Jack", "Richer"));
+        Course course = courseDAO.create(TestUtils.createCourse(1, "math", "Algebra, Geometry"));
         studentDAO.assignToCourse(student, course);
         studentDAO.unassignFromCourse(student.getId(), course.getId());
 

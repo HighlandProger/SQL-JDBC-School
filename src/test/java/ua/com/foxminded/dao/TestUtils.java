@@ -9,7 +9,7 @@ import java.util.List;
 
 public class TestUtils {
 
-    public static List<Student> getStudentsWithoutGroupId() {
+    public static List<Student> getFiveRandomStudentsWithoutGroupId() {
 
         return Arrays.asList(
             new Student(1, null, "Jack", "Richer"),
@@ -19,11 +19,11 @@ public class TestUtils {
             new Student(5, null, "Andy", "Johnson"));
     }
 
-    public static Student getStudent() {
-        return new Student(1, null, "Jack", "Richer");
+    public static Student createStudent(long id, Long groupId, String name, String lastName) {
+        return new Student(id, groupId, name, lastName);
     }
 
-    public static List<Group> getGroups() {
+    public static List<Group> getFiveRandomGroups() {
 
         return Arrays.asList(
             new Group(1, "DF-23"),
@@ -33,11 +33,11 @@ public class TestUtils {
             new Group(5, "HB-21"));
     }
 
-    public static Group getGroup() {
-        return new Group(1, "DF-23");
+    public static Group createGroup(long id, String name) {
+        return new Group(id, name);
     }
 
-    public static List<Course> getCourses() {
+    public static List<Course> getFiveRandomCourses() {
 
         return Arrays.asList(
             new Course(1, "math", "Algebra, Geometry"),
@@ -47,7 +47,7 @@ public class TestUtils {
             new Course(5, "physics", "Very cool course. Be careful with electricity"));
     }
 
-    public static Course getCourse() {
-        return new Course(1, "math", "Algebra, Geometry");
+    public static Course createCourse(long id, String name, String description) {
+        return new Course(id, name, description);
     }
 }
