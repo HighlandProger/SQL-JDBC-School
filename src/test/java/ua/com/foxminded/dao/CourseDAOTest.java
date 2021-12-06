@@ -9,6 +9,7 @@ import ua.com.foxminded.exception.DAOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CourseDAOTest {
 
@@ -19,12 +20,11 @@ class CourseDAOTest {
 
     @BeforeEach
     void initTables() {
-
         sqlRunner.createTables();
     }
 
     @Test
-    void create() {
+    void create_shouldCreateCourse() {
 
         assertEquals(0, courseDAO.getAll().size());
         expectedCourse = TestUtils.createCourse(1, "math", "Algebra, Geometry");
@@ -34,7 +34,7 @@ class CourseDAOTest {
     }
 
     @Test
-    void getById() {
+    void getById_shouldReturnCourse() {
 
         assertEquals(0, courseDAO.getAll().size());
         expectedCourse = TestUtils.createCourse(1, "math", "Algebra, Geometry");
@@ -45,22 +45,22 @@ class CourseDAOTest {
     }
 
     @Test
-    void getById_shouldThrowDAOException_whenIdIsAbsent() {
+    void getById_shouldThrowDAOException_whenCourseIsNotFoundWithGivenId() {
 
         assertEquals(0, courseDAO.getAll().size());
         long randomId = 2;
-        try {
-            courseDAO.getById(randomId);
-        } catch (DAOException e) {
-            String expectedExceptionString = "Course is not found";
-            String actualExceptionString = e.getMessage();
+        Exception exception = assertThrows(DAOException.class,
+            () -> courseDAO.getById(randomId));
 
-            assertEquals(expectedExceptionString, actualExceptionString);
-        }
+        String expectedExceptionString = "Course is not found";
+        String actualExceptionString = exception.getMessage();
+
+        assertEquals(expectedExceptionString, actualExceptionString);
+
     }
 
     @Test
-    void getAll() {
+    void getAll_shouldReturnAllCourses() {
 
         assertEquals(0, courseDAO.getAll().size());
         List<Course> expectedCourses = TestUtils.getFiveRandomCourses();
