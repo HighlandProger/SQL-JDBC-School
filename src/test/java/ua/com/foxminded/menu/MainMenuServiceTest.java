@@ -1,96 +1,87 @@
 package ua.com.foxminded.menu;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ua.com.foxminded.dao.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import ua.com.foxminded.dao.TestUtils;
 import ua.com.foxminded.dao.postgres.PostgresSqlCourseDAO;
 import ua.com.foxminded.dao.postgres.PostgresSqlGroupDAO;
 import ua.com.foxminded.dao.postgres.PostgresSqlStudentDAO;
 import ua.com.foxminded.domain.Course;
-import ua.com.foxminded.domain.Group;
 import ua.com.foxminded.domain.Student;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.mockito.Mockito.verify;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+@ExtendWith(MockitoExtension.class)
 class MainMenuServiceTest {
 
-    MainMenuService menuService = new MainMenuService();
-    GroupDAO groupDAO = new PostgresSqlGroupDAO();
-    StudentDAO studentDAO = new PostgresSqlStudentDAO();
-    CourseDAO courseDAO = new PostgresSqlCourseDAO();
-    SqlRunner sqlRunner = new SqlRunner();
+    @InjectMocks
+    public MainMenuService menuService;
+    @Mock
+    PostgresSqlGroupDAO groupDAO;
+    @Mock
+    PostgresSqlStudentDAO studentDAO;
+    @Mock
+    PostgresSqlCourseDAO courseDAO;
 
-    @BeforeEach
-    void initTables() {
-        sqlRunner.createTables();
+    @Test
+    void findAllGroupsWithLessOrEqualsStudentCount_shouldCallGroupDaoMethod() {
+
+        int maxAssignedStudentsCount = 2;
+        menuService.findAllGroupsWithLessOrEqualsStudentCount(maxAssignedStudentsCount);
+        verify(groupDAO).getLessOrEqualsByStudentsCount(maxAssignedStudentsCount);
     }
 
     @Test
-    void findAllGroupsWithLessOrEqualsStudentCount_shouldReturnListOfGroups() {
+    void findAllStudentsRelatedToCourseWithGivenName_shouldCallStudentDaoMethod() {
 
-        List<Group> groups = new ArrayList<>(TestUtils.getFiveRandomGroups());
-        List<Student> students = TestUtils.getFiveRandomStudentsWithoutGroupId();
-        for (int i = 0; i < groups.size(); i++){
-            groupDAO.create(groups.get(i));
-            studentDAO.create(students.get(i));
-        }
-
-        studentDAO.assignToGroup(students.get(0), groups.get(0));
-        studentDAO.assignToGroup(students.get(1), groups.get(0));
-        studentDAO.assignToGroup(students.get(2), groups.get(1));
-        studentDAO.assignToGroup(students.get(3), groups.get(2));
-        studentDAO.assignToGroup(students.get(4), groups.get(3));
-
-        int maxAssignedStudentsCount = 1;
-
-        //Exclude groups with students count = 2 (index - 0) and without students (index - 4)
-        groups.remove(4);
-        groups.remove(0);
-
-        List<Group> expectedGroups = new ArrayList<>(groups);
-        List<Group> actualGroups = menuService.findAllGroupsWithLessOrEqualsStudentCount(maxAssignedStudentsCount);
-
-        expectedGroups.sort((el1, el2) -> (int) (el1.getId()-el2.getId()));
-        actualGroups.sort((el1, el2) -> (int) (el1.getId()-el2.getId()));
-
-        assertEquals(expectedGroups, actualGroups);
+        String randomCourseName = "math";
+        menuService.findAllStudentsRelatedToCourseWithGivenName(randomCourseName);
+        verify(studentDAO).getByCourseName(randomCourseName);
     }
 
     @Test
-    void findAllStudentsRelatedToCourseWithGivenName_shouldReturnListOfStudents() {
-        List<Student> expectedStudents = TestUtils.getFiveRandomStudentsWithoutGroupId();
-        Course course = courseDAO.create(TestUtils.createCourse(1, "math", "Algebra, Geometry"));
+    void addNewStudent_shouldCallStudentDaoMethod() {
 
-        for (Student student : expectedStudents) {
-            studentDAO.create(student);
-            studentDAO.assignToCourse(student, course);
-        }
-
-        List<Student> actualStudents = menuService.findAllStudentsRelatedToCourseWithGivenName(course.getName());
-
-        assertEquals(expectedStudents, actualStudents);
+        Student student = TestUtils.createStudent(1, "Jack", "Johnson");
+        menuService.addNewStudent(student.getName(), student.getLastName());
+        verify(studentDAO).create(new Student(student.getName(), student.getLastName()));
     }
 
     @Test
-    void addNewStudent() {
+    void deleteStudentByStudentId_shouldCallStudentDaoMethod() {
+
+        Student student = TestUtils.createStudent(1, "Jack", "Johnson");
+        menuService.deleteStudentByStudentId(student.getId());
+        verify(studentDAO).delete(student.getId());
     }
 
     @Test
-    void deleteStudentByStudentId() {
+    void addStudentToTheCourseFromAList_shouldCallStudentDaoAndCourseDaoMethods() {
+
+        Student student = TestUtils.createStudent(1, "Jack", "Johnson");
+        Course course = TestUtils.createCourse(4, "math", "Algebra, Geometry");
+        menuService.addStudentToTheCourseFromAList(student.getId(), course.getId());
+        verify(studentDAO).getById(student.getId());
+        verify(courseDAO).getById(course.getId());
+        verify(studentDAO).assignToCourse(null, null);
     }
 
     @Test
-    void addStudentToTheCourseFromAList() {
+    void removeStudentFromCourse_shouldCallStudentDaoMethod() {
+
+        Student student = TestUtils.createStudent(1, "Jack", "Johnson");
+        Course course = TestUtils.createCourse(4, "math", "Algebra, Geometry");
+        menuService.removeStudentFromCourse(student.getId(), course.getId());
+        verify(studentDAO).unassignFromCourse(student.getId(), course.getId());
     }
 
     @Test
-    void removeStudentFromCourse() {
-    }
+    void getCoursesList_shouldCallCourseDaoMethod() {
 
-    @Test
-    void getCoursesList() {
+        menuService.getCoursesList();
+        verify(courseDAO).getAll();
     }
 }

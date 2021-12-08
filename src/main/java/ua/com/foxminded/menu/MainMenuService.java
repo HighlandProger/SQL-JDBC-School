@@ -11,9 +11,9 @@ import java.util.List;
 
 public class MainMenuService {
 
-    private final PostgresSqlGroupDAO groupDAO = new PostgresSqlGroupDAO();
-    private final PostgresSqlStudentDAO studentDAO = new PostgresSqlStudentDAO();
-    private final PostgresSqlCourseDAO courseDAO = new PostgresSqlCourseDAO();
+    private PostgresSqlGroupDAO groupDAO = new PostgresSqlGroupDAO();
+    private PostgresSqlStudentDAO studentDAO = new PostgresSqlStudentDAO();
+    private PostgresSqlCourseDAO courseDAO = new PostgresSqlCourseDAO();
 
     public List<Group> findAllGroupsWithLessOrEqualsStudentCount(int studentCount) {
         return groupDAO.getLessOrEqualsByStudentsCount(studentCount);
