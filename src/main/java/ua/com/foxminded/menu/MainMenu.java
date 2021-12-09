@@ -24,7 +24,7 @@ public class MainMenu {
     public void runMenu() {
 
         try {
-            print(View.getMenu());
+            print(MainMenuFormatter.getMenu());
             processRequest();
         } catch (MainMenuException e) {
             runMenu();
@@ -33,7 +33,7 @@ public class MainMenu {
 
     private void processRequest() {
 
-        print(View.getMenu());
+        print(MainMenuFormatter.getMenu());
         try {
             int requestNumber = readInt();
             switch (requestNumber) {
@@ -70,16 +70,16 @@ public class MainMenu {
 
     private void findGroupsByStudentCount() {
 
-        print(View.getEnterMessage(STUDENT, COUNT_FIELD));
+        print(MainMenuFormatter.getEnterMessage(STUDENT, COUNT_FIELD));
         List<Group> groups = mainMenuService.findAllGroupsWithLessOrEqualsStudentCount(readInt());
-        print(View.getListPositions(groups));
+        print(MainMenuFormatter.getListPositions(groups));
     }
 
     private void findStudentsByCourseName() {
 
-        print(View.getEnterMessage(COURSE, NAME_FIELD));
+        print(MainMenuFormatter.getEnterMessage(COURSE, NAME_FIELD));
         List<Student> students = mainMenuService.findAllStudentsRelatedToCourseWithGivenName(readString());
-        print(View.getListPositions(students));
+        print(MainMenuFormatter.getListPositions(students));
 
     }
 
@@ -88,7 +88,7 @@ public class MainMenu {
         String name;
         String lastName;
         while (true) {
-            print(View.getEnterMessage(STUDENT, NAME_FIELD));
+            print(MainMenuFormatter.getEnterMessage(STUDENT, NAME_FIELD));
             name = readString();
             if (name.equals(EMPTY_STRING)) {
                 print(Message.EMPTY_VALUE_MESSAGE);
@@ -98,7 +98,7 @@ public class MainMenu {
         }
 
         while (true) {
-            print(View.getEnterMessage(STUDENT, LAST_NAME_FIELD));
+            print(MainMenuFormatter.getEnterMessage(STUDENT, LAST_NAME_FIELD));
             lastName = readString();
             if (lastName.equals(EMPTY_STRING)) {
                 print(Message.EMPTY_VALUE_MESSAGE);
@@ -107,46 +107,46 @@ public class MainMenu {
             }
         }
         mainMenuService.addNewStudent(name, lastName);
-        print(View.getAddedStudent(name, lastName));
+        print(MainMenuFormatter.getAddedStudent(name, lastName));
     }
 
     private void deleteStudentById() {
 
-        print(View.getEnterMessage(STUDENT, ID_FIELD));
+        print(MainMenuFormatter.getEnterMessage(STUDENT, ID_FIELD));
         long studentId = readLong();
         mainMenuService.deleteStudentByStudentId(studentId);
-        print(View.getDeletedStudent(studentId));
+        print(MainMenuFormatter.getDeletedStudent(studentId));
     }
 
     private void addStudentToTheCourse() {
 
         List<Course> courseList = mainMenuService.getCoursesList();
-        print(View.getListPositions(courseList));
-        print(View.getEnterMessage(COURSE, ID_FIELD));
+        print(MainMenuFormatter.getListPositions(courseList));
+        print(MainMenuFormatter.getEnterMessage(COURSE, ID_FIELD));
         long courseId = readLong();
-        print(View.getEnterMessage(STUDENT, ID_FIELD));
+        print(MainMenuFormatter.getEnterMessage(STUDENT, ID_FIELD));
         long studentId = readLong();
         try {
             mainMenuService.addStudentToTheCourseFromAList(studentId, courseId);
-            print(View.getAddedStudentToCourse(studentId, courseId, false));
+            print(MainMenuFormatter.getAddedStudentToCourse(studentId, courseId, false));
         } catch (DAOException e) {
-            print(View.getAddedStudentToCourse(studentId, courseId, true));
+            print(MainMenuFormatter.getAddedStudentToCourse(studentId, courseId, true));
         }
     }
 
     private void removeStudentFromTheCourse() {
 
-        print(View.getEnterMessage(STUDENT, ID_FIELD));
+        print(MainMenuFormatter.getEnterMessage(STUDENT, ID_FIELD));
         long studentId = readLong();
-        print(View.getEnterMessage(COURSE, ID_FIELD));
+        print(MainMenuFormatter.getEnterMessage(COURSE, ID_FIELD));
         long courseId = readLong();
         mainMenuService.removeStudentFromCourse(studentId, courseId);
-        print(View.getStudentRemovedFromCourse(studentId, courseId));
+        print(MainMenuFormatter.getStudentRemovedFromCourse(studentId, courseId));
     }
 
     private void backToMainMenuRequest() {
 
-        print(View.getBackToMainMenuRequest());
+        print(MainMenuFormatter.getBackToMainMenuRequest());
         readString();
         runMenu();
     }

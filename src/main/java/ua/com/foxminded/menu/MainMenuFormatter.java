@@ -7,7 +7,7 @@ import ua.com.foxminded.domain.Student;
 import java.util.Arrays;
 import java.util.List;
 
-public class View {
+public class MainMenuFormatter {
 
     static final String NEW_LINE = "\n";
     private static final String SPACE = " ";
@@ -22,7 +22,7 @@ public class View {
         "0. Exit"
     );
 
-    private View() {
+    private MainMenuFormatter() {
     }
 
     static String getMenu() {
@@ -118,8 +118,8 @@ public class View {
         return Message.STUDENT_WITH_ID_MESSAGE + studentId + " deleted";
     }
 
-    static String getAddedStudentToCourse(long studentId, long courseId, boolean wasCourseAddedToStudent) {
-        if (wasCourseAddedToStudent) {
+    static String getAddedStudentToCourse(long studentId, long courseId, boolean wasStudentAddedToCourse) {
+        if (wasStudentAddedToCourse) {
             return Message.STUDENT_WITH_ID_MESSAGE + studentId + " was already added to the course with id = " + courseId;
         } else {
             return Message.STUDENT_WITH_ID_MESSAGE + studentId + " added to the course with id = " + courseId;

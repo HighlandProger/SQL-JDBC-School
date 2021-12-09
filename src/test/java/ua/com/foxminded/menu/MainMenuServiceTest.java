@@ -13,21 +13,22 @@ import ua.com.foxminded.domain.Course;
 import ua.com.foxminded.domain.Student;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MainMenuServiceTest {
 
     @InjectMocks
-    public MainMenuService menuService;
+    private MainMenuService menuService;
     @Mock
-    PostgresSqlGroupDAO groupDAO;
+    private PostgresSqlGroupDAO groupDAO;
     @Mock
-    PostgresSqlStudentDAO studentDAO;
+    private PostgresSqlStudentDAO studentDAO;
     @Mock
-    PostgresSqlCourseDAO courseDAO;
+    private PostgresSqlCourseDAO courseDAO;
 
     @Test
-    void findAllGroupsWithLessOrEqualsStudentCount_shouldCallGroupDaoMethod() {
+    void findAllGroupsWithLessOrEqualsStudentCount_shouldCallGroupDaoGetLessOrEqualsByStudentsCount() {
 
         int maxAssignedStudentsCount = 2;
         menuService.findAllGroupsWithLessOrEqualsStudentCount(maxAssignedStudentsCount);
@@ -35,7 +36,7 @@ class MainMenuServiceTest {
     }
 
     @Test
-    void findAllStudentsRelatedToCourseWithGivenName_shouldCallStudentDaoMethod() {
+    void findAllStudentsRelatedToCourseWithGivenName_shouldCallStudentDaoCreate() {
 
         String randomCourseName = "math";
         menuService.findAllStudentsRelatedToCourseWithGivenName(randomCourseName);
@@ -45,41 +46,42 @@ class MainMenuServiceTest {
     @Test
     void addNewStudent_shouldCallStudentDaoMethod() {
 
-        Student student = TestUtils.createStudent(1, "Jack", "Johnson");
-        menuService.addNewStudent(student.getName(), student.getLastName());
-        verify(studentDAO).create(new Student(student.getName(), student.getLastName()));
+        String randomStudentName = "Jack";
+        String randomStudentLastName = "Johnson";
+        menuService.addNewStudent(randomStudentName, randomStudentLastName);
+        verify(studentDAO).create(new Student(randomStudentName, randomStudentLastName));
     }
 
     @Test
-    void deleteStudentByStudentId_shouldCallStudentDaoMethod() {
+    void deleteStudentByStudentId_shouldCallStudentDaoDelete() {
 
-        Student student = TestUtils.createStudent(1, "Jack", "Johnson");
-        menuService.deleteStudentByStudentId(student.getId());
-        verify(studentDAO).delete(student.getId());
+        long randomStudentId = 4;
+        menuService.deleteStudentByStudentId(randomStudentId);
+        verify(studentDAO).delete(randomStudentId);
     }
 
     @Test
-    void addStudentToTheCourseFromAList_shouldCallStudentDaoAndCourseDaoMethods() {
+    void addStudentToTheCourseFromAList_shouldCallStudentDaoAssignToCourse() {
 
         Student student = TestUtils.createStudent(1, "Jack", "Johnson");
         Course course = TestUtils.createCourse(4, "math", "Algebra, Geometry");
+        when(studentDAO.getById(student.getId())).thenReturn(student);
+        when(courseDAO.getById(course.getId())).thenReturn(course);
         menuService.addStudentToTheCourseFromAList(student.getId(), course.getId());
-        verify(studentDAO).getById(student.getId());
-        verify(courseDAO).getById(course.getId());
-        verify(studentDAO).assignToCourse(null, null);
+        verify(studentDAO).assignToCourse(student, course);
     }
 
     @Test
-    void removeStudentFromCourse_shouldCallStudentDaoMethod() {
+    void removeStudentFromCourse_shouldCallStudentDaoUnassignFromCourse() {
 
-        Student student = TestUtils.createStudent(1, "Jack", "Johnson");
-        Course course = TestUtils.createCourse(4, "math", "Algebra, Geometry");
-        menuService.removeStudentFromCourse(student.getId(), course.getId());
-        verify(studentDAO).unassignFromCourse(student.getId(), course.getId());
+        long randomStudentId = 4;
+        long randomCourseId = 7;
+        menuService.removeStudentFromCourse(randomStudentId, randomCourseId);
+        verify(studentDAO).unassignFromCourse(randomStudentId, randomCourseId);
     }
 
     @Test
-    void getCoursesList_shouldCallCourseDaoMethod() {
+    void getCoursesList_shouldCallCourseDaoGetAll() {
 
         menuService.getCoursesList();
         verify(courseDAO).getAll();
