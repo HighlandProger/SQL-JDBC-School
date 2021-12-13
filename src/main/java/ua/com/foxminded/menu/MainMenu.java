@@ -66,7 +66,7 @@ public class MainMenu {
 
         print(MainMenuFormatter.getEnterMessage(STUDENT, COUNT_FIELD));
         List<Group> groups = mainMenuService.findAllGroupsWithLessOrEqualsStudentCount(menuScanner.readInt());
-        print(MainMenuFormatter.getListPositions(groups));
+        print(MainMenuFormatter.getTabularFormat(groups));
         backToMainMenuRequest();
     }
 
@@ -74,7 +74,7 @@ public class MainMenu {
 
         print(MainMenuFormatter.getEnterMessage(COURSE, NAME_FIELD));
         List<Student> students = mainMenuService.findAllStudentsRelatedToCourseWithGivenName(menuScanner.readString());
-        print(MainMenuFormatter.getListPositions(students));
+        print(MainMenuFormatter.getTabularFormat(students));
         backToMainMenuRequest();
     }
 
@@ -86,7 +86,7 @@ public class MainMenu {
             print(MainMenuFormatter.getEnterMessage(STUDENT, NAME_FIELD));
             name = menuScanner.readString();
             if (name.equals(EMPTY_STRING)) {
-                print(Message.EMPTY_VALUE_MESSAGE);
+                print(Messages.EMPTY_VALUE_MESSAGE);
             } else {
                 break;
             }
@@ -96,7 +96,7 @@ public class MainMenu {
             print(MainMenuFormatter.getEnterMessage(STUDENT, LAST_NAME_FIELD));
             lastName = menuScanner.readString();
             if (lastName.equals(EMPTY_STRING)) {
-                print(Message.EMPTY_VALUE_MESSAGE);
+                print(Messages.EMPTY_VALUE_MESSAGE);
             } else {
                 break;
             }
@@ -118,16 +118,16 @@ public class MainMenu {
     private void addStudentToTheCourse() {
 
         List<Course> courseList = mainMenuService.getCoursesList();
-        print(MainMenuFormatter.getListPositions(courseList));
+        print(MainMenuFormatter.getTabularFormat(courseList));
         print(MainMenuFormatter.getEnterMessage(COURSE, ID_FIELD));
         long courseId = menuScanner.readLong();
         print(MainMenuFormatter.getEnterMessage(STUDENT, ID_FIELD));
         long studentId = menuScanner.readLong();
         try {
             mainMenuService.addStudentToTheCourseFromAList(studentId, courseId);
-            print(MainMenuFormatter.getAddedStudentToCourse(studentId, courseId, false));
+            print(MainMenuFormatter.getAddedStudentToCourse(studentId, courseId));
         } catch (DAOException e) {
-            print(MainMenuFormatter.getAddedStudentToCourse(studentId, courseId, true));
+            print(MainMenuFormatter.getAddingStudentToCourseError());
         }
         backToMainMenuRequest();
     }

@@ -1,10 +1,9 @@
-package ua.com.foxminded.dao;
+package ua.com.foxminded.dao.postgresql;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ua.com.foxminded.dao.postgres.PostgreSqlCourseDAO;
-import ua.com.foxminded.dao.postgres.PostgreSqlGroupDAO;
-import ua.com.foxminded.dao.postgres.PostgreSqlStudentDAO;
+import ua.com.foxminded.dao.SqlRunner;
+import ua.com.foxminded.dao.TestUtils;
 import ua.com.foxminded.domain.Course;
 import ua.com.foxminded.domain.Group;
 import ua.com.foxminded.domain.Student;
@@ -14,7 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class StudentDAOTest {
+class PostgreSqlStudentDAOTest {
 
     private final SqlRunner sqlRunner = new SqlRunner();
     private final PostgreSqlStudentDAO studentDAO = new PostgreSqlStudentDAO();

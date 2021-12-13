@@ -1,4 +1,4 @@
-package ua.com.foxminded.dao.postgres;
+package ua.com.foxminded.dao.postgresql;
 
 import org.postgresql.util.PSQLException;
 import ua.com.foxminded.dao.DAOFactory;

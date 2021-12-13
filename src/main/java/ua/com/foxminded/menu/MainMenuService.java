@@ -1,8 +1,8 @@
 package ua.com.foxminded.menu;
 
-import ua.com.foxminded.dao.postgres.PostgreSqlCourseDAO;
-import ua.com.foxminded.dao.postgres.PostgreSqlGroupDAO;
-import ua.com.foxminded.dao.postgres.PostgreSqlStudentDAO;
+import ua.com.foxminded.dao.postgresql.PostgreSqlCourseDAO;
+import ua.com.foxminded.dao.postgresql.PostgreSqlGroupDAO;
+import ua.com.foxminded.dao.postgresql.PostgreSqlStudentDAO;
 import ua.com.foxminded.domain.Course;
 import ua.com.foxminded.domain.Group;
 import ua.com.foxminded.domain.Student;

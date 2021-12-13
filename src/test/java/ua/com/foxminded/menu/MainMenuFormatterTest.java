@@ -65,7 +65,7 @@ class MainMenuFormatterTest {
                 "3 - RG-37\n" +
                 "4 - GR-46\n" +
                 "5 - HB-21\n";
-        actualString = MainMenuFormatter.getListPositions(randomList);
+        actualString = MainMenuFormatter.getTabularFormat(randomList);
 
         assertEquals(expectedString, actualString);
     }
@@ -103,13 +103,10 @@ class MainMenuFormatterTest {
     }
 
     @Test
-    void getAddedStudentToCourse_shouldReturnStudentWasAlreadyAddedToCourseStudentStringById_whenStudentAddedToCourseIsTrue() {
+    void getAddingStudentToCourseError_shouldReturnErrorDuringAddingStudentToCourse() {
 
-        long randomStudentId = 3;
-        long randomCourseId = 6;
-        expectedString = "Student with id = 3 was already added to the course with id = 6";
-        actualString = MainMenuFormatter.getAddedStudentToCourse
-            (randomStudentId, randomCourseId, true);
+        expectedString = "Error during adding student to course";
+        actualString = MainMenuFormatter.getAddingStudentToCourseError();
 
         assertEquals(expectedString, actualString);
     }
@@ -121,7 +118,7 @@ class MainMenuFormatterTest {
         long randomCourseId = 6;
         expectedString = "Student with id = 3 added to the course with id = 6";
         actualString = MainMenuFormatter.getAddedStudentToCourse
-            (randomStudentId, randomCourseId, false);
+            (randomStudentId, randomCourseId);
 
         assertEquals(expectedString, actualString);
     }

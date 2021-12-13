@@ -27,7 +27,7 @@ public class MainMenuFormatter {
 
     static String getMenu() {
 
-        StringBuilder builder = new StringBuilder(Message.WELCOME_MESSAGE);
+        StringBuilder builder = new StringBuilder(Messages.WELCOME_MESSAGE);
         builder
             .append(NEW_LINE)
             .append(NEW_LINE);
@@ -37,7 +37,7 @@ public class MainMenuFormatter {
                 .append(NEW_LINE);
         }
         builder.append(NEW_LINE);
-        builder.append(Message.ENTER_REQUEST_NUMBER_MESSAGE);
+        builder.append(Messages.ENTER_REQUEST_NUMBER_MESSAGE);
 
         return builder.toString();
     }
@@ -46,63 +46,63 @@ public class MainMenuFormatter {
 
         return
             NEW_LINE +
-                Message.RETURN_TO_MAIN_MENU_MESSAGE;
+                Messages.RETURN_TO_MAIN_MENU_MESSAGE;
     }
 
     static String getValueError() {
 
         return
-            Message.INVALID_VALUE_MESSAGE +
+            Messages.INVALID_VALUE_MESSAGE +
                 NEW_LINE +
-                Message.PRESS_ENTER_TO_CONTINUE_MESSAGE;
+                Messages.PRESS_ENTER_TO_CONTINUE_MESSAGE;
     }
 
-
-    static String getListPositions(List<?> list) {
+    static String getTabularFormat(List<?> list) {
 
         StringBuilder builder = new StringBuilder();
 
-        try {
-
-            if (list.get(0) instanceof Group) {
-                for (int i = 1; i < list.size() + 1; i++) {
-                    Group group = (Group) list.get(i - 1);
-                    builder
-                        .append(i)
-                        .append(SPACE)
-                        .append(DASH)
-                        .append(SPACE)
-                        .append(group.getName())
-                        .append(NEW_LINE);
-                }
-            }
-
-            if (list.get(0) instanceof Student) {
-                for (int i = 1; i < list.size() + 1; i++) {
-                    Student student = (Student) list.get(i - 1);
-                    builder
-                        .append(i)
-                        .append(DASH)
-                        .append(student.getName())
-                        .append(SPACE)
-                        .append(student.getLastName())
-                        .append(NEW_LINE);
-                }
-            }
-
-            if (list.get(0) instanceof Course) {
-                for (int i = 1; i < list.size() + 1; i++) {
-                    Course course = (Course) list.get(i - 1);
-                    builder
-                        .append(i)
-                        .append(DASH)
-                        .append(course.getName())
-                        .append(NEW_LINE);
-                }
-            }
-        } catch (IndexOutOfBoundsException e) {
-            builder.append(Message.NO_SUCH_OBJECTS_MESSAGE).append(NEW_LINE);
+        if (list.isEmpty()){
+            builder.append(Messages.NO_SUCH_OBJECTS_MESSAGE).append(NEW_LINE);
+            return builder.toString();
         }
+
+        if (list.get(0) instanceof Group) {
+            for (int i = 1; i < list.size() + 1; i++) {
+                Group group = (Group) list.get(i - 1);
+                builder
+                    .append(i)
+                    .append(SPACE)
+                    .append(DASH)
+                    .append(SPACE)
+                    .append(group.getName())
+                    .append(NEW_LINE);
+            }
+        }
+
+        if (list.get(0) instanceof Student) {
+            for (int i = 1; i < list.size() + 1; i++) {
+                Student student = (Student) list.get(i - 1);
+                builder
+                    .append(i)
+                    .append(DASH)
+                    .append(student.getName())
+                    .append(SPACE)
+                    .append(student.getLastName())
+                    .append(NEW_LINE);
+            }
+        }
+
+        if (list.get(0) instanceof Course) {
+            for (int i = 1; i < list.size() + 1; i++) {
+                Course course = (Course) list.get(i - 1);
+                builder
+                    .append(i)
+                    .append(DASH)
+                    .append(course.getName())
+                    .append(NEW_LINE);
+            }
+        }
+
         return builder.toString();
     }
 
@@ -115,18 +115,18 @@ public class MainMenuFormatter {
     }
 
     static String getDeletedStudent(long studentId) {
-        return Message.STUDENT_WITH_ID_MESSAGE + studentId + " deleted";
+        return Messages.STUDENT_WITH_ID_MESSAGE + studentId + " deleted";
     }
 
-    static String getAddedStudentToCourse(long studentId, long courseId, boolean wasStudentAddedToCourse) {
-        if (wasStudentAddedToCourse) {
-            return Message.STUDENT_WITH_ID_MESSAGE + studentId + " was already added to the course with id = " + courseId;
-        } else {
-            return Message.STUDENT_WITH_ID_MESSAGE + studentId + " added to the course with id = " + courseId;
-        }
+    static String getAddedStudentToCourse(long studentId, long courseId) {
+            return Messages.STUDENT_WITH_ID_MESSAGE + studentId + " added to the course with id = " + courseId;
     }
 
     static String getStudentRemovedFromCourse(long studentId, long courseId) {
-        return Message.STUDENT_WITH_ID_MESSAGE + studentId + " removed from the course with id = " + courseId;
+        return Messages.STUDENT_WITH_ID_MESSAGE + studentId + " removed from the course with id = " + courseId;
+    }
+
+    static String getAddingStudentToCourseError(){
+        return Messages.ADDING_STUDENT_TO_COURSE_ERROR;
     }
 }
