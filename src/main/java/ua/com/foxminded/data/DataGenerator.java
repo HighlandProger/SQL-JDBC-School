@@ -1,8 +1,8 @@
 package ua.com.foxminded.data;
 
-import ua.com.foxminded.dao.postgres.PostgresSqlCourseDAO;
-import ua.com.foxminded.dao.postgres.PostgresSqlGroupDAO;
-import ua.com.foxminded.dao.postgres.PostgresSqlStudentDAO;
+import ua.com.foxminded.dao.postgres.PostgreSqlCourseDAO;
+import ua.com.foxminded.dao.postgres.PostgreSqlGroupDAO;
+import ua.com.foxminded.dao.postgres.PostgreSqlStudentDAO;
 import ua.com.foxminded.domain.Course;
 import ua.com.foxminded.domain.Group;
 import ua.com.foxminded.domain.Student;
@@ -17,9 +17,9 @@ public class DataGenerator {
     private static final int GROUPS_COUNT = 10;
     private static final int STUDENTS_COUNT = 200;
     private static final int MAX_ASSIGNED_COURSES_COUNT = 3;
-    private final PostgresSqlGroupDAO groupDAO = new PostgresSqlGroupDAO();
-    private final PostgresSqlStudentDAO studentDAO = new PostgresSqlStudentDAO();
-    private final PostgresSqlCourseDAO courseDAO = new PostgresSqlCourseDAO();
+    private final PostgreSqlGroupDAO groupDAO = new PostgreSqlGroupDAO();
+    private final PostgreSqlStudentDAO studentDAO = new PostgreSqlStudentDAO();
+    private final PostgreSqlCourseDAO courseDAO = new PostgreSqlCourseDAO();
 
     public void generateData() {
         createGroups();

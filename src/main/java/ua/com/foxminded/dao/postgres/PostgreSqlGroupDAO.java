@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostgresSqlGroupDAO implements GroupDAO {
+public class PostgreSqlGroupDAO implements GroupDAO {
 
     private static final String ID = "id";
     private static final String NAME = "name";

@@ -2,7 +2,7 @@ package ua.com.foxminded.dao;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ua.com.foxminded.dao.postgres.PostgresSqlCourseDAO;
+import ua.com.foxminded.dao.postgres.PostgreSqlCourseDAO;
 import ua.com.foxminded.domain.Course;
 import ua.com.foxminded.exception.DAOException;
 
@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class CourseDAOTest {
 
     private final SqlRunner sqlRunner = new SqlRunner();
-    private final PostgresSqlCourseDAO courseDAO = new PostgresSqlCourseDAO();
+    private final PostgreSqlCourseDAO courseDAO = new PostgreSqlCourseDAO();
     private Course expectedCourse;
     private Course actualCourse;
 

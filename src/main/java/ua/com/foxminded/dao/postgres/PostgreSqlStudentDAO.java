@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostgresSqlStudentDAO implements StudentDAO {
+public class PostgreSqlStudentDAO implements StudentDAO {
 
     private static final String ID = "id";
     private static final String GROUP_ID = "group_Id";

@@ -9,7 +9,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostgresSqlCourseDAO implements CourseDAO {
+public class PostgreSqlCourseDAO implements CourseDAO {
 
     private static final String ID = "id";
     private static final String NAME = "name";

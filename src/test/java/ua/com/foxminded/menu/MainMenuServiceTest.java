@@ -6,9 +6,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.com.foxminded.dao.TestUtils;
-import ua.com.foxminded.dao.postgres.PostgresSqlCourseDAO;
-import ua.com.foxminded.dao.postgres.PostgresSqlGroupDAO;
-import ua.com.foxminded.dao.postgres.PostgresSqlStudentDAO;
+import ua.com.foxminded.dao.postgres.PostgreSqlCourseDAO;
+import ua.com.foxminded.dao.postgres.PostgreSqlGroupDAO;
+import ua.com.foxminded.dao.postgres.PostgreSqlStudentDAO;
 import ua.com.foxminded.domain.Course;
 import ua.com.foxminded.domain.Student;
 
@@ -21,11 +21,11 @@ class MainMenuServiceTest {
     @InjectMocks
     private MainMenuService menuService;
     @Mock
-    private PostgresSqlGroupDAO groupDAO;
+    private PostgreSqlGroupDAO groupDAO;
     @Mock
-    private PostgresSqlStudentDAO studentDAO;
+    private PostgreSqlStudentDAO studentDAO;
     @Mock
-    private PostgresSqlCourseDAO courseDAO;
+    private PostgreSqlCourseDAO courseDAO;
 
     @Test
     void findAllGroupsWithLessOrEqualsStudentCount_shouldCallGroupDaoGetLessOrEqualsByStudentsCount() {

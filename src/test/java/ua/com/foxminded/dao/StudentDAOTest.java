@@ -2,9 +2,9 @@ package ua.com.foxminded.dao;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ua.com.foxminded.dao.postgres.PostgresSqlCourseDAO;
-import ua.com.foxminded.dao.postgres.PostgresSqlGroupDAO;
-import ua.com.foxminded.dao.postgres.PostgresSqlStudentDAO;
+import ua.com.foxminded.dao.postgres.PostgreSqlCourseDAO;
+import ua.com.foxminded.dao.postgres.PostgreSqlGroupDAO;
+import ua.com.foxminded.dao.postgres.PostgreSqlStudentDAO;
 import ua.com.foxminded.domain.Course;
 import ua.com.foxminded.domain.Group;
 import ua.com.foxminded.domain.Student;
@@ -17,9 +17,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class StudentDAOTest {
 
     private final SqlRunner sqlRunner = new SqlRunner();
-    private final PostgresSqlStudentDAO studentDAO = new PostgresSqlStudentDAO();
-    private final PostgresSqlGroupDAO groupDAO = new PostgresSqlGroupDAO();
-    private final PostgresSqlCourseDAO courseDAO = new PostgresSqlCourseDAO();
+    private final PostgreSqlStudentDAO studentDAO = new PostgreSqlStudentDAO();
+    private final PostgreSqlGroupDAO groupDAO = new PostgreSqlGroupDAO();
+    private final PostgreSqlCourseDAO courseDAO = new PostgreSqlCourseDAO();
     private Student expectedStudent;
     private Student actualStudent;
     private List<Student> expectedStudents;

@@ -53,13 +53,9 @@ public class MainMenu {
                 case 6:
                     removeStudentFromTheCourse();
                     break;
-                case 0:
-                    System.exit(0);
-                    break;
                 default:
                     break;
             }
-            backToMainMenuRequest();
         } catch (MainMenuException e) {
             System.out.println(e.getMessage());
             System.exit(0);
@@ -71,6 +67,7 @@ public class MainMenu {
         print(MainMenuFormatter.getEnterMessage(STUDENT, COUNT_FIELD));
         List<Group> groups = mainMenuService.findAllGroupsWithLessOrEqualsStudentCount(menuScanner.readInt());
         print(MainMenuFormatter.getListPositions(groups));
+        backToMainMenuRequest();
     }
 
     private void findStudentsByCourseName() {
@@ -78,7 +75,7 @@ public class MainMenu {
         print(MainMenuFormatter.getEnterMessage(COURSE, NAME_FIELD));
         List<Student> students = mainMenuService.findAllStudentsRelatedToCourseWithGivenName(menuScanner.readString());
         print(MainMenuFormatter.getListPositions(students));
-
+        backToMainMenuRequest();
     }
 
     private void addStudent() {
@@ -106,6 +103,7 @@ public class MainMenu {
         }
         mainMenuService.addNewStudent(name, lastName);
         print(MainMenuFormatter.getAddedStudent(name, lastName));
+        backToMainMenuRequest();
     }
 
     private void deleteStudentById() {
@@ -114,6 +112,7 @@ public class MainMenu {
         long studentId = menuScanner.readLong();
         mainMenuService.deleteStudentByStudentId(studentId);
         print(MainMenuFormatter.getDeletedStudent(studentId));
+        backToMainMenuRequest();
     }
 
     private void addStudentToTheCourse() {
@@ -130,6 +129,7 @@ public class MainMenu {
         } catch (DAOException e) {
             print(MainMenuFormatter.getAddedStudentToCourse(studentId, courseId, true));
         }
+        backToMainMenuRequest();
     }
 
     private void removeStudentFromTheCourse() {
@@ -140,10 +140,10 @@ public class MainMenu {
         long courseId = menuScanner.readLong();
         mainMenuService.removeStudentFromCourse(studentId, courseId);
         print(MainMenuFormatter.getStudentRemovedFromCourse(studentId, courseId));
+        backToMainMenuRequest();
     }
 
     private void backToMainMenuRequest() {
-
         print(MainMenuFormatter.getBackToMainMenuRequest());
         menuScanner.readString();
         runMenu();

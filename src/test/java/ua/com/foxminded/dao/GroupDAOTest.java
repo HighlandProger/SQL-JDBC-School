@@ -2,8 +2,8 @@ package ua.com.foxminded.dao;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ua.com.foxminded.dao.postgres.PostgresSqlGroupDAO;
-import ua.com.foxminded.dao.postgres.PostgresSqlStudentDAO;
+import ua.com.foxminded.dao.postgres.PostgreSqlGroupDAO;
+import ua.com.foxminded.dao.postgres.PostgreSqlStudentDAO;
 import ua.com.foxminded.domain.Group;
 import ua.com.foxminded.domain.Student;
 
@@ -14,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class GroupDAOTest {
 
     private final SqlRunner sqlRunner = new SqlRunner();
-    private final PostgresSqlGroupDAO groupDAO = new PostgresSqlGroupDAO();
-    private final PostgresSqlStudentDAO studentDAO = new PostgresSqlStudentDAO();
+    private final PostgreSqlGroupDAO groupDAO = new PostgreSqlGroupDAO();
+    private final PostgreSqlStudentDAO studentDAO = new PostgreSqlStudentDAO();
 
     @BeforeEach
     void initTables() {
