@@ -14,10 +14,10 @@ class MainMenuFormatterTest {
     private String actualString;
 
     @Test
-    void getMenu() {
+    void getMenu_shouldReturnMenuString() {
 
         expectedString =
-                "Hi! Choose number of position and press \"ENTER\"\n" +
+            "Hi! Choose number of position and press \"ENTER\"\n" +
                 "\n" +
                 "1. Find all groups with less or equals student count.\n" +
                 "2. Find all students related to course with given name\n" +
@@ -34,10 +34,10 @@ class MainMenuFormatterTest {
     }
 
     @Test
-    void getBackToMainMenuRequest() {
+    void getBackToMainMenuRequest_shouldReturnRequestString() {
 
         expectedString =
-                "\n" +
+            "\n" +
                 "Press any key to return to main menu ...";
         actualString = MainMenuFormatter.getBackToMainMenuRequest();
 
@@ -45,10 +45,10 @@ class MainMenuFormatterTest {
     }
 
     @Test
-    void getValueError() {
+    void getValueError_shouldReturnValueErrorString() {
 
         expectedString =
-                "Invalid value\n" +
+            "Invalid value\n" +
                 "To continue press \"ENTER\"";
         actualString = MainMenuFormatter.getValueError();
 
@@ -56,7 +56,7 @@ class MainMenuFormatterTest {
     }
 
     @Test
-    void getListPositions() {
+    void getListPositions_shouldReturnNumberedArrayStringFromList() {
 
         List<Group> randomList = TestUtils.getFiveRandomGroups();
         expectedString =
@@ -71,7 +71,7 @@ class MainMenuFormatterTest {
     }
 
     @Test
-    void getEnterMessage() {
+    void getEnterMessage_shouldReturnEnterMessageFromObjectAndFieldNames() {
 
         String randomObjectName = "student";
         String randomFieldName = "last name";
@@ -82,7 +82,7 @@ class MainMenuFormatterTest {
     }
 
     @Test
-    void getAddedStudent() {
+    void getAddedStudent_shouldReturnAddedStudentStringFromNameAndLastName() {
 
         String randomStudentName = "Jack";
         String randomStudentLastName = "Johnson";
@@ -93,7 +93,7 @@ class MainMenuFormatterTest {
     }
 
     @Test
-    void getDeletedStudent() {
+    void getDeletedStudent_shouldReturnDeletedStudentStringById() {
 
         long randomStudentId = 5;
         expectedString = "Student with id = 5 deleted";
@@ -103,20 +103,31 @@ class MainMenuFormatterTest {
     }
 
     @Test
-    void getAddedStudentToCourse() {
+    void getAddedStudentToCourse_shouldReturnStudentWasAlreadyAddedToCourseStudentStringById_whenStudentAddedToCourseIsTrue() {
 
         long randomStudentId = 3;
         long randomCourseId = 6;
-        boolean randomWasStudentAddedToCourse = true;
         expectedString = "Student with id = 3 was already added to the course with id = 6";
         actualString = MainMenuFormatter.getAddedStudentToCourse
-            (randomStudentId, randomCourseId, randomWasStudentAddedToCourse);
+            (randomStudentId, randomCourseId, true);
 
         assertEquals(expectedString, actualString);
     }
 
     @Test
-    void getStudentRemovedFromCourse() {
+    void getAddedStudentToCourse_shouldReturnStudentAddedToCourseStudentStringById_whenStudentAddedToCourseIsFalse() {
+
+        long randomStudentId = 3;
+        long randomCourseId = 6;
+        expectedString = "Student with id = 3 added to the course with id = 6";
+        actualString = MainMenuFormatter.getAddedStudentToCourse
+            (randomStudentId, randomCourseId, false);
+
+        assertEquals(expectedString, actualString);
+    }
+
+    @Test
+    void getStudentRemovedFromCourse_shouldReturnStudentRemovedFromTheCourseByIds() {
 
         long randomStudentId = 3;
         long randomCourseId = 6;

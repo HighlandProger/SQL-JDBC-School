@@ -7,7 +7,6 @@ import ua.com.foxminded.exception.DAOException;
 import ua.com.foxminded.exception.MainMenuException;
 
 import java.util.List;
-import java.util.Scanner;
 
 public class MainMenu {
 
@@ -18,8 +17,8 @@ public class MainMenu {
     private static final String LAST_NAME_FIELD = "last name";
     private static final String COUNT_FIELD = "count";
     private static final String ID_FIELD = "id";
-    private final MainMenuService mainMenuService = new MainMenuService();
-    private Scanner scanner = new Scanner(System.in);
+    private MainMenuService mainMenuService = new MainMenuService();
+    private MainMenuScanner menuScanner = new MainMenuScanner();
 
     public void runMenu() {
 
@@ -33,9 +32,8 @@ public class MainMenu {
 
     private void processRequest() {
 
-        print(MainMenuFormatter.getMenu());
         try {
-            int requestNumber = readInt();
+            int requestNumber = menuScanner.readInt();
             switch (requestNumber) {
                 case 1:
                     findGroupsByStudentCount();
@@ -71,14 +69,14 @@ public class MainMenu {
     private void findGroupsByStudentCount() {
 
         print(MainMenuFormatter.getEnterMessage(STUDENT, COUNT_FIELD));
-        List<Group> groups = mainMenuService.findAllGroupsWithLessOrEqualsStudentCount(readInt());
+        List<Group> groups = mainMenuService.findAllGroupsWithLessOrEqualsStudentCount(menuScanner.readInt());
         print(MainMenuFormatter.getListPositions(groups));
     }
 
     private void findStudentsByCourseName() {
 
         print(MainMenuFormatter.getEnterMessage(COURSE, NAME_FIELD));
-        List<Student> students = mainMenuService.findAllStudentsRelatedToCourseWithGivenName(readString());
+        List<Student> students = mainMenuService.findAllStudentsRelatedToCourseWithGivenName(menuScanner.readString());
         print(MainMenuFormatter.getListPositions(students));
 
     }
@@ -89,7 +87,7 @@ public class MainMenu {
         String lastName;
         while (true) {
             print(MainMenuFormatter.getEnterMessage(STUDENT, NAME_FIELD));
-            name = readString();
+            name = menuScanner.readString();
             if (name.equals(EMPTY_STRING)) {
                 print(Message.EMPTY_VALUE_MESSAGE);
             } else {
@@ -99,7 +97,7 @@ public class MainMenu {
 
         while (true) {
             print(MainMenuFormatter.getEnterMessage(STUDENT, LAST_NAME_FIELD));
-            lastName = readString();
+            lastName = menuScanner.readString();
             if (lastName.equals(EMPTY_STRING)) {
                 print(Message.EMPTY_VALUE_MESSAGE);
             } else {
@@ -113,7 +111,7 @@ public class MainMenu {
     private void deleteStudentById() {
 
         print(MainMenuFormatter.getEnterMessage(STUDENT, ID_FIELD));
-        long studentId = readLong();
+        long studentId = menuScanner.readLong();
         mainMenuService.deleteStudentByStudentId(studentId);
         print(MainMenuFormatter.getDeletedStudent(studentId));
     }
@@ -123,9 +121,9 @@ public class MainMenu {
         List<Course> courseList = mainMenuService.getCoursesList();
         print(MainMenuFormatter.getListPositions(courseList));
         print(MainMenuFormatter.getEnterMessage(COURSE, ID_FIELD));
-        long courseId = readLong();
+        long courseId = menuScanner.readLong();
         print(MainMenuFormatter.getEnterMessage(STUDENT, ID_FIELD));
-        long studentId = readLong();
+        long studentId = menuScanner.readLong();
         try {
             mainMenuService.addStudentToTheCourseFromAList(studentId, courseId);
             print(MainMenuFormatter.getAddedStudentToCourse(studentId, courseId, false));
@@ -137,9 +135,9 @@ public class MainMenu {
     private void removeStudentFromTheCourse() {
 
         print(MainMenuFormatter.getEnterMessage(STUDENT, ID_FIELD));
-        long studentId = readLong();
+        long studentId = menuScanner.readLong();
         print(MainMenuFormatter.getEnterMessage(COURSE, ID_FIELD));
-        long courseId = readLong();
+        long courseId = menuScanner.readLong();
         mainMenuService.removeStudentFromCourse(studentId, courseId);
         print(MainMenuFormatter.getStudentRemovedFromCourse(studentId, courseId));
     }
@@ -147,27 +145,8 @@ public class MainMenu {
     private void backToMainMenuRequest() {
 
         print(MainMenuFormatter.getBackToMainMenuRequest());
-        readString();
+        menuScanner.readString();
         runMenu();
-    }
-
-    private int readInt() {
-        this.scanner = new Scanner(System.in);
-        if (scanner.hasNextInt()) {
-            return scanner.nextInt();
-        } else throw new MainMenuException("You entered a non-integer number");
-    }
-
-    private long readLong() {
-        this.scanner = new Scanner(System.in);
-        if (scanner.hasNextLong()) {
-            return scanner.nextLong();
-        } else throw new MainMenuException("You entered a non-long number");
-    }
-
-    private String readString() {
-        this.scanner = new Scanner(System.in);
-        return scanner.nextLine();
     }
 
     private void print(String string) {
