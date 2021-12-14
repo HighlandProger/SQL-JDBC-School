@@ -1,6 +1,5 @@
 package ua.com.foxminded.dao.postgresql;
 
-import org.postgresql.util.PSQLException;
 import ua.com.foxminded.dao.DAOFactory;
 import ua.com.foxminded.dao.StudentDAO;
 import ua.com.foxminded.domain.Course;
@@ -165,22 +164,17 @@ public class PostgreSqlStudentDAO implements StudentDAO {
 
     protected Student createStudentFromResultSet(ResultSet resultSet) throws SQLException {
 
-        try {
-            Student student = new Student(
-                resultSet.getLong(ID),
-                resultSet.getLong(GROUP_ID),
-                resultSet.getString(NAME),
-                resultSet.getString(LAST_NAME));
+        Student student = new Student(
+            resultSet.getLong(ID),
+            resultSet.getLong(GROUP_ID),
+            resultSet.getString(NAME),
+            resultSet.getString(LAST_NAME));
 
-            if (student.getGroupId() == 0){
-                student.setGroupId(null);
-            }
-
-            return student;
-        } catch (PSQLException e) {
-            throw new DAOException("Cannot create student from result set");
+        if (student.getGroupId() == 0) {
+            student.setGroupId(null);
         }
 
+        return student;
     }
 
     private void setStatementParameters(PreparedStatement statement,

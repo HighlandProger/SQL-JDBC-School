@@ -57,50 +57,74 @@ public class MainMenuFormatter {
                 Messages.PRESS_ENTER_TO_CONTINUE_MESSAGE;
     }
 
+    private static StringBuilder getTabularFormatFromGroups(List<Group> groups) {
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 1; i < groups.size() + 1; i++) {
+            Group group = groups.get(i - 1);
+            builder
+                .append(i)
+                .append(SPACE)
+                .append(DASH)
+                .append(SPACE)
+                .append(group.getName())
+                .append(NEW_LINE);
+        }
+
+        return builder;
+    }
+
+    private static StringBuilder getTabularFormatFromStudents(List<Student> students) {
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 1; i < students.size() + 1; i++) {
+            Student student = students.get(i - 1);
+            builder
+                .append(i)
+                .append(DASH)
+                .append(student.getName())
+                .append(SPACE)
+                .append(student.getLastName())
+                .append(NEW_LINE);
+        }
+
+        return builder;
+    }
+
+    private static StringBuilder getTabularFormatFromCourses(List<Course> courses) {
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 1; i < courses.size() + 1; i++) {
+            Course course = courses.get(i - 1);
+            builder
+                .append(i)
+                .append(DASH)
+                .append(course.getName())
+                .append(NEW_LINE);
+        }
+
+        return builder;
+    }
+
     static String getTabularFormat(List<?> list) {
 
         StringBuilder builder = new StringBuilder();
 
-        if (list.isEmpty()){
+        if (list.isEmpty()) {
             builder.append(Messages.NO_SUCH_OBJECTS_MESSAGE).append(NEW_LINE);
             return builder.toString();
         }
 
         if (list.get(0) instanceof Group) {
-            for (int i = 1; i < list.size() + 1; i++) {
-                Group group = (Group) list.get(i - 1);
-                builder
-                    .append(i)
-                    .append(SPACE)
-                    .append(DASH)
-                    .append(SPACE)
-                    .append(group.getName())
-                    .append(NEW_LINE);
-            }
+            builder = getTabularFormatFromGroups(((List<Group>) list));
         }
 
         if (list.get(0) instanceof Student) {
-            for (int i = 1; i < list.size() + 1; i++) {
-                Student student = (Student) list.get(i - 1);
-                builder
-                    .append(i)
-                    .append(DASH)
-                    .append(student.getName())
-                    .append(SPACE)
-                    .append(student.getLastName())
-                    .append(NEW_LINE);
-            }
+            builder = getTabularFormatFromStudents((List<Student>) list);
         }
 
         if (list.get(0) instanceof Course) {
-            for (int i = 1; i < list.size() + 1; i++) {
-                Course course = (Course) list.get(i - 1);
-                builder
-                    .append(i)
-                    .append(DASH)
-                    .append(course.getName())
-                    .append(NEW_LINE);
-            }
+            builder = getTabularFormatFromCourses((List<Course>) list);
         }
 
         return builder.toString();
@@ -119,14 +143,14 @@ public class MainMenuFormatter {
     }
 
     static String getAddedStudentToCourse(long studentId, long courseId) {
-            return Messages.STUDENT_WITH_ID_MESSAGE + studentId + " added to the course with id = " + courseId;
+        return Messages.STUDENT_WITH_ID_MESSAGE + studentId + " added to the course with id = " + courseId;
     }
 
     static String getStudentRemovedFromCourse(long studentId, long courseId) {
         return Messages.STUDENT_WITH_ID_MESSAGE + studentId + " removed from the course with id = " + courseId;
     }
 
-    static String getAddingStudentToCourseError(){
+    static String getAddingStudentToCourseError() {
         return Messages.ADDING_STUDENT_TO_COURSE_ERROR;
     }
 }

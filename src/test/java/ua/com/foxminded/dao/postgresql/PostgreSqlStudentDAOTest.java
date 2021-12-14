@@ -106,7 +106,7 @@ class PostgreSqlStudentDAOTest {
     }
 
     @Test
-    void assignToCourse_shouldAssignCourseToSudent() {
+    void assignToCourse_shouldAssignCourseToStudent() {
 
         Course course = courseDAO.create(TestUtils.createCourse(1, "math", "Algebra, Geometry"));
         List<Student> assignedStudentsBefore = studentDAO.getByCourseName(course.getName());
